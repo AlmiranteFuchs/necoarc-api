@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { Router } from 'express';
-import { home_controller } from './controllers/home';
-import { private_controller } from './controllers/private';
+import { home_controller } from './routes_controllers/home';
+import { private_controller } from './routes_controllers/private';
 import { createAuthorizationMiddleware } from "./middleware";
 
 dotenv.config();
