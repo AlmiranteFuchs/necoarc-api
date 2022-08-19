@@ -1,4 +1,6 @@
 import dotenv from 'dotenv';
+import { whatsapp_web_js } from './api_models/api_pedrolopezWaWeb';
+import { CurrentApi } from './api_models/api_services_model';
 dotenv.config();
 console.log(`                                     
 _____                 _____         
@@ -10,6 +12,8 @@ _____                 _____
 //#region API Express Config
 const http: any = require("http");
 const port: any = process.env.PORT || 3000;
+
+export const current_api: CurrentApi = new CurrentApi(new whatsapp_web_js());
 
 import { App } from "./app";
 

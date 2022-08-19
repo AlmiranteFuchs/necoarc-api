@@ -1,25 +1,21 @@
 export class CurrentApi {
     private _api: API;
-    private _api_name: string;
 
-    constructor(api: API, name: string) {
+    constructor(api: API) {
         this._api = api;
-        this._api_name = name;
     }
 
-    public send_simple_message() {
-        return this._api.send_message();
+    public send_simple_message(phone_number: string, text_message: string) {
+        return this._api.send_message(phone_number, text_message);
     }
 
+    // Getters
+    public api_client(): any { return this._api._bot_client; }
 }
 
+// Main Interface
 export interface API {
-    send_message(): boolean;
-}
-
-//Exemple
-export class pedroslopezWaWeb implements API{
-    send_message(): boolean {
-        throw new Error("Method not implemented.");
-    }
+    _bot_client?: any;
+    _api_name?: string;
+    send_message(phone_number: string, text_message: string): boolean;
 }
