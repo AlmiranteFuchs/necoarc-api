@@ -1,2 +1,4 @@
 # necoarc-api
- Neco Arcc or Never Ending Conversation Output Assigned to Report Code Corruption is a project that aims to control diferent conversation API's
+ Neco Arc or Never Ending Conversation Output Application by Received Commmand is a project that aims to control different conversational API's
+ 
+ ( Used by Cassioh )
