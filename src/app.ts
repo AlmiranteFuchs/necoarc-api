@@ -1,3 +1,4 @@
+import bodyParser from 'body-parser';
 import express, { Express, Request, Response } from 'express';
 import { router } from "./router";
 export class App {
@@ -5,6 +6,8 @@ export class App {
 
   constructor() {
     this.server = express();
+    this.server.use(bodyParser.urlencoded({ extended: false }))
+    this.server.use(bodyParser.json())
     this.router();
   }
 

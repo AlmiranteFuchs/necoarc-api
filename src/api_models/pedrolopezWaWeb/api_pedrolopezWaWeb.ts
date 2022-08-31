@@ -1,4 +1,9 @@
 import { API } from "../api_services_model";
+import dotenv from 'dotenv';
+import axios from "axios";
+import { ApiServicesController, APIS_TYPES } from "../../api_controllers/api_services_controller";
+
+dotenv.config();
 
 export class whatsapp_web_js implements API {
     //TODO: Implement try and catch --> switch API runtime?
@@ -9,8 +14,10 @@ export class whatsapp_web_js implements API {
 
     _api_name?: string;
     _bot_client: any;
+    _active: boolean;
 
     constructor(api_name?: string) {
+        this._active = false;
         this._api_name = api_name ?? whatsapp_web_js.name;
         console.log(`⚡️[Neco]: Initializing ${this._api_name} API'`);
 
@@ -28,25 +35,31 @@ export class whatsapp_web_js implements API {
             console.log(`⚡️[${this._api_name}]: Not connected... Scan below! `);
             setTimeout(() => { qrcode.generate(qr, { small: true }); }, 3000);
         });
-
         this._bot_client.on('authenticated', (session: any) => { console.log(`⚡️[${this._api_name}]: Logged!!`); });
-
-        this._bot_client.on('ready', () => { console.log(`⚡️[${this._api_name}]: Client is ready!`); });                    //  Initialized Event
+        this._bot_client.on('ready', () => { console.log(`⚡️[${this._api_name}]: Client is ready!`); this._active = true; });//  Initialized Event
 
         this._bot_client.on('message', (message: any) => {                                                                   //  On message Event
             if (message.body.startsWith("/")) {
                 console.log(`⚡️[${this._api_name}]: New message: From: ${message.from} On: ${message.to} Chat`);
-                message.reply("Tentando um comando!");
+                ApiServicesController.Propagate_message(APIS_TYPES.whatsapp_web_js, message);
             }
         });
-
-
         this._bot_client.initialize();                                                                                       //  Initialize
     }
 
-
-    send_message(phone_number: string, text_message: string): boolean {
-        throw new Error("Method not implemented.");
+    async send_message(phone_number: string, text_message: string, reply?: boolean): Promise<boolean> {
+        if (!this._active) { return false };
+        try {
+            if (reply) {
+                await this._bot_client.reply(text_message, phone_number);
+                return true;
+            }
+            await this._bot_client.sendMessage(phone_number, text_message);
+            return true;
+        } catch (error) {
+            console.log(`⚡️[${this._api_name}]: Error, could not send message: \n ${error}`);
+            return false;
+        }
     }
 
 }

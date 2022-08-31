@@ -5,8 +5,12 @@ export class CurrentApi {
         this._api = api;
     }
 
-    public send_simple_message(phone_number: string, text_message: string) {
-        return this._api.send_message(phone_number, text_message);
+    public async send_simple_message(phone_number: string, text_message: string, reply?: boolean) {
+        try {
+            return this._api.send_message(phone_number, text_message, reply);
+        } catch (error) {
+            return false;
+        }
     }
 
     // Getters
@@ -17,5 +21,6 @@ export class CurrentApi {
 export interface API {
     _bot_client?: any;
     _api_name?: string;
-    send_message(phone_number: string, text_message: string): boolean;
+    _active: boolean;
+    send_message(phone_number: string, text_message: string, reply?: boolean): Promise<boolean>;
 }
