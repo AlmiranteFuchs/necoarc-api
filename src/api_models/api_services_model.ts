@@ -22,5 +22,14 @@ export interface API {
     _bot_client?: any;
     _api_name?: string;
     _active: boolean;
-    send_message(phone_number: string, text_message: string, reply?: boolean): Promise<boolean>;
+    send_message(phone_number: string, text_message: string, reply?: boolean): Promise<CommForm>;
+}
+
+export interface CommForm {
+    result: boolean
+    message: string
+}
+export const commForm: CommForm = {
+    result: false,
+    message: ""
 }

@@ -12,7 +12,7 @@ const router: Router = Router();
 
 //Rotas
 router.get('/', home_controller.Home);
-router.get('/private', createAuthorizationMiddleware(secret), private_controller.Private);
-router.post('/send_simple_message', createAuthorizationMiddleware(secret), send_simple_message_controller.Send)
+router.get('/private', createAuthorizationMiddleware(secret), private_controller.Private);                                              // Test Route
+router.post('/send_simple_message', createAuthorizationMiddleware(secret), send_simple_message_controller.Send)                         // Message 
 
 export { router };
