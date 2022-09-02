@@ -15,8 +15,9 @@ const port: any = process.env.PORT || 3000;
 
 import { App } from "./app";
 import { baileys_api } from './api_models/baileys/api_baileys';
+import { ApiServicesController } from './api_controllers/api_services_controller';
 
 new App().server.listen(port, () => { console.log(`⚡️[Neco]: Server is running at http://localhost:${port}`); });
 //#endregion APi Express Config
-
 export const current_api: CurrentApi = new CurrentApi(new baileys_api());
+//ApiServicesController.Create_session("Sessão");

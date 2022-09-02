@@ -13,12 +13,13 @@ export class CurrentApi {
         }
     }
 
-    public async get_QR(){
+    public async get_QR() {
         return this._api.get_qrCode();
     }
 
     // Getters
     public api_client(): any { return this._api._bot_client; }
+    public session_name(): string { return this._api._api_name as string; }
 }
 
 // Main Interface
