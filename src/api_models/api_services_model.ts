@@ -13,6 +13,10 @@ export class CurrentApi {
         }
     }
 
+    public async get_QR(){
+        return this._api.get_qrCode();
+    }
+
     // Getters
     public api_client(): any { return this._api._bot_client; }
 }
@@ -22,7 +26,10 @@ export interface API {
     _bot_client?: any;
     _api_name?: string;
     _active: boolean;
+    _qr_log: string;
+
     send_message(phone_number: string, text_message: string, reply?: boolean): Promise<CommForm>;
+    get_qrCode(): Promise<CommForm>;
 }
 
 export interface CommForm {

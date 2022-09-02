@@ -15,10 +15,12 @@ export class whatsapp_web_js implements API {
     _api_name?: string;
     _bot_client: any;
     _active: boolean;
-
+    _qr_log: string;
+    
     constructor(api_name?: string) {
         this._active = false;
         this._api_name = api_name ?? whatsapp_web_js.name;
+        this._qr_log = "";
         console.log(`⚡️[Neco]: Initializing ${this._api_name} API'`);
 
         //API CONFIG

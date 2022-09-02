@@ -19,21 +19,27 @@ export class baileys_api implements API {
     _api_name?: string | undefined;
     _bot_client: any;
     _active: boolean;
+    _qr_log: string;
 
     constructor(api_name?: string) {
         this._active = false;
         this._api_name = api_name ?? baileys_api.name;
+        this._qr_log = "";
+
         console.log(`⚡️[Neco]: Initializing ${this._api_name} API'`);
 
         // API CONFIG
         this.connectToWhatsApp();
     }
+
     async connectToWhatsApp() {
+        // This initializes an instance of the API, the "client" of it
+
         const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
 
         const sock = makeWASocket({
             printQRInTerminal: true,
-            auth: state
+            auth: state,
         } as any);
 
         // Defines 
@@ -45,6 +51,11 @@ export class baileys_api implements API {
         // Conn update Event
         sock.ev.on('connection.update', (update) => {
             const { connection, lastDisconnect } = update;
+
+            if (update.qr) {
+                this._qr_log = update.qr;
+            }
+
             if (connection === 'close') {
                 this._active = false;
                 const shouldReconnect = (lastDisconnect?.error as Boom)?.output?.statusCode !== DisconnectReason.loggedOut;
@@ -54,14 +65,14 @@ export class baileys_api implements API {
                     this.connectToWhatsApp();
                 }
             } else if (connection === 'open') {
-                console.log(`[${this._api_name}]: opened connection`);
+                console.log(`\n\n # [${this._api_name}]: Opened connection # \n\n`);
                 this._active = true;
             }
         });
 
         // On Message Event
         sock.ev.on('messages.upsert', async m => {
-            console.log(`[${this._api_name}]: `, JSON.stringify(m, undefined, 2));
+            //console.log(`[${this._api_name}]: `, JSON.stringify(m, undefined, 2));
         });
     }
 
@@ -74,5 +85,29 @@ export class baileys_api implements API {
             console.log(`⚡️[${this._api_name}]: Error, could not send message: \n ${error}`);
             return { result: false, message: `Não foi possível enviar: ${error}` };
         }
+    }
+
+    async get_qrCode(): Promise<CommForm> {
+        //Auxiliar wait
+        const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+       /*  if (!this._active) {
+            return { result: false, message: "Não é possivel resgatar QR, serviço não iniciado" };
+        } */
+        setTimeout(() => {
+            return { result: false, message: "timeout" };
+        }, 3000);
+
+        let qr: string = "";
+        while (!qr) {
+            qr = this._get_qr(); 
+            await sleep(200);
+        }
+
+        return { result: true, message: qr };
+    }
+
+    private _get_qr(): string {
+        return this._qr_log;
     }
 }
