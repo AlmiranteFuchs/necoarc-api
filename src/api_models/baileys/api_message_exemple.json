@@ -1,0 +1,26 @@
+{
+    "messages": [
+      {
+        "key": {
+          "remoteJid": "554498579172@s.whatsapp.net",
+          "fromMe": false,
+          "id": "3EB0AF0DF4DF8F01950A"
+        },
+        "messageTimestamp": 1662085954,
+        "pushName": "Almirante Fuchs",
+        "message": {
+          "conversation": "aa",
+          "messageContextInfo": {
+            "deviceListMetadata": {
+              "senderKeyHash": "W50TynWglR2aaw==",
+              "senderTimestamp": "1661275867",
+              "recipientKeyHash": "eo7F7GkgR1zIPw==",
+              "recipientTimestamp": "1661529902"
+            },
+            "deviceListMetadataVersion": 2
+          }
+        }
+      }
+    ],
+    "type": "notify"
+  }

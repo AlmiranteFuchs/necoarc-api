@@ -6,6 +6,6 @@ export const createAuthorizationMiddleware = (secret: string) => (req: Request, 
     if (auth_header == secret) {
         next();
     } else {
-        res.status(401).send("Nya! You don't have access!! Go enlight yourself as you wait https://www.youtube.com/watch?v=XisJD8V1Rqw&t=28s");
+        res.status(401).send("Access Denied");
     }
 }

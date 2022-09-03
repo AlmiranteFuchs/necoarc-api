@@ -3,7 +3,7 @@ import { Request, Response } from "express"
 class HomeConteroller {
     public Home(req: Request, res: Response) {
         res.send(
-            "Home!",
+            "Serviço de envio de mensagem da Manfing, author: Fuchs!",
         )
     }
 }

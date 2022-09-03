@@ -131,3 +131,7 @@ dist
 
 # Auth Tokens
 .wwebjs_auth
+auth_info_baileys
+
+# Files
+qrCodeLogs

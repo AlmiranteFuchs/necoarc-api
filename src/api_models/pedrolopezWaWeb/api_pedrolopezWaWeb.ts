@@ -1,4 +1,4 @@
-import { API } from "../api_services_model";
+import { API, CommForm } from "../api_services_model";
 import dotenv from 'dotenv';
 import axios from "axios";
 import { ApiServicesController, APIS_TYPES } from "../../api_controllers/api_services_controller";
@@ -15,10 +15,12 @@ export class whatsapp_web_js implements API {
     _api_name?: string;
     _bot_client: any;
     _active: boolean;
-
+    _qr_log: string;
+    
     constructor(api_name?: string) {
         this._active = false;
         this._api_name = api_name ?? whatsapp_web_js.name;
+        this._qr_log = "";
         console.log(`⚡️[Neco]: Initializing ${this._api_name} API'`);
 
         //API CONFIG
@@ -47,18 +49,14 @@ export class whatsapp_web_js implements API {
         this._bot_client.initialize();                                                                                       //  Initialize
     }
 
-    async send_message(phone_number: string, text_message: string, reply?: boolean): Promise<boolean> {
-        if (!this._active) { return false };
+    async send_message(phone_number: string, text_message: string, reply?: boolean): Promise<CommForm> {
+        if (!this._active) { return { result: false, message: "Error, API não iniciada" } };
         try {
-            if (reply) {
-                await this._bot_client.reply(text_message, phone_number);
-                return true;
-            }
             await this._bot_client.sendMessage(phone_number, text_message);
-            return true;
+            return { result: true, message: "Mensagem enviada com sucesso" };
         } catch (error) {
             console.log(`⚡️[${this._api_name}]: Error, could not send message: \n ${error}`);
-            return false;
+            return { result: false, message: `Não foi possível enviar: ${error}` };
         }
     }
 
