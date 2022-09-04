@@ -27,10 +27,12 @@ export interface API {
     _bot_client?: any;
     _api_name?: string;
     _active: boolean;
+    _save_token?: boolean;
     _qr_log: string;
 
     send_message(phone_number: string, text_message: string, reply?: boolean): Promise<CommForm>;
     get_qrCode(): Promise<CommForm>;
+    close_connection(): Promise<CommForm>;
 }
 
 export interface CommForm {

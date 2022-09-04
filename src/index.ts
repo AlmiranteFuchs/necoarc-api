@@ -19,5 +19,5 @@ import { ApiServicesController } from './api_controllers/api_services_controller
 
 new App().server.listen(port, () => { console.log(`⚡️[Neco]: Server is running at http://localhost:${port}`); });
 //#endregion APi Express Config
-export const current_api: CurrentApi = new CurrentApi(new baileys_api());
+//export const current_api: CurrentApi = new CurrentApi(new baileys_api());
 //ApiServicesController.Create_session("Sessão");
