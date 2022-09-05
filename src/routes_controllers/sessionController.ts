@@ -14,7 +14,7 @@ class SessionController {
 
         try {
             let result = ApiServicesController.Create_session(session_name);
-            
+
             if (result) { return res.status(200).send("Sessão criada com sucesso"); }
 
             return res.status(500).send("Não foi possível criar sessão");
@@ -53,6 +53,24 @@ class SessionController {
             return res.status(500).send("Não foi possível resgatar QR: " + result.message);
         } catch (error) {
             return res.status(500).send("Não foi possível resgatar QR: " + error);
+        }
+    }
+
+    public async Status(req: Request, res: Response) {
+
+        let session_name = req.body.session_name ?? false;
+
+        if (!session_name) { return res.status(400).send("Parâmentros insuficientes ou ausentes") }
+
+        try {
+            let result = ApiServicesController.Get_session_status(session_name);
+
+            // Vide APIStatus enum
+            if (result) { return res.status(200).send(`${result.status}`); }
+
+            return res.status(500).send("Não foi possível buscar status da sessão: não encontrada");
+        } catch (error) {
+            return res.status(500).send("Não foi possível buscar status da sessão: " + error);
         }
     }
 }

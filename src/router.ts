@@ -17,5 +17,6 @@ router.get('/private', createAuthorizationMiddleware(secret), private_controller
 router.post('/send_simple_message', createAuthorizationMiddleware(secret), send_simple_message_controller.Send)                         // Message 
 router.get('/create_session', createAuthorizationMiddleware(secret), session_controller.Create)                                         // Create Session 
 router.get('/get_QR', createAuthorizationMiddleware(secret), session_controller.GetQR)                                                  // QR 
+router.get('/status', createAuthorizationMiddleware(secret), session_controller.Status)                                                 // Session Status 
 
 export { router };

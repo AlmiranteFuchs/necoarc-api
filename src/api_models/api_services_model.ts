@@ -20,15 +20,16 @@ export class CurrentApi {
     // Getters
     public api_client(): any { return this._api._bot_client; }
     public session_name(): string { return this._api._api_name as string; }
+    public session_status(): APIStatus { return this._api._status; }
 }
 
 // Main Interface
 export interface API {
     _bot_client?: any;
     _api_name?: string;
-    _active: boolean;
     _save_token?: boolean;
     _qr_log: string;
+    _status:APIStatus;
 
     send_message(phone_number: string, text_message: string, reply?: boolean): Promise<CommForm>;
     get_qrCode(): Promise<CommForm>;
@@ -39,7 +40,9 @@ export interface CommForm {
     result: boolean
     message: string
 }
-export const commForm: CommForm = {
-    result: false,
-    message: ""
+
+export enum APIStatus {
+    inactive = 0,
+    awaiting_qr = 1,
+    active = 2
 }
