@@ -134,4 +134,4 @@ dist
 auth_info_baileys
 
 # Files
-qrCodeLogs
+qrCodeLogs/*
