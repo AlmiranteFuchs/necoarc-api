@@ -7,6 +7,8 @@ RUN npm install
 
 COPY . .
 
+CMD ["touch", "qrCodeLogs"]
+
 RUN npm run build
 
 FROM node:16-alpine as production

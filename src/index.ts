@@ -1,5 +1,4 @@
 import dotenv from 'dotenv';
-import { whatsapp_web_js } from './api_models/pedrolopezWaWeb/api_pedrolopezWaWeb';
 import { CurrentApi } from './api_models/api_services_model';
 dotenv.config();
 console.log(`                                     
