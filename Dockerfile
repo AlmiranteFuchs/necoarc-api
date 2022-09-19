@@ -7,7 +7,7 @@ RUN npm install
 
 COPY . .
 
-CMD ["touch", "qrCodeLogs"]
+CMD ["mkdir", "qrCodeLogs"]
 
 RUN npm run build
 
