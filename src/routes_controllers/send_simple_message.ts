@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
-import { current_api } from "..";
-import { CommForm } from "../api_models/api_services_model";
+import { ApiServicesController } from "../api_controllers/api_services_controller";
+import { CommForm, CurrentApi } from "../api_models/api_services_model";
 
 class SendSimpleMessageController {
     public async Send(req: Request, res: Response) {
@@ -8,11 +8,18 @@ class SendSimpleMessageController {
         let phone_number = req.body.phone_number ?? null;
         let text_message = req.body.text_message ?? null;
         let reply = req.body.reply ?? false;
-
+        let session_name = req.body.session_name ?? false;
+        
         //TODO: interface para validar número "@.us etc"
-        if (!phone_number || !text_message) {
-            return res.status(500).send("Parâmentros insuficientes ou ausentes");
+        if (!phone_number || !text_message || !session_name) {
+            return res.status(400).send("Parâmentros insuficientes ou ausentes");
         }
+
+        let current_api = ApiServicesController.Get_session(session_name) as CurrentApi;
+        if (!current_api) {
+            return res.status(400).send(`Sessão ${session_name} não encontrada`);
+        }
+
 
         let result: CommForm = {} as CommForm;
 

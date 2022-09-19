@@ -1,5 +1,4 @@
 import dotenv from 'dotenv';
-import { whatsapp_web_js } from './api_models/pedrolopezWaWeb/api_pedrolopezWaWeb';
 import { CurrentApi } from './api_models/api_services_model';
 dotenv.config();
 console.log(`                                     
@@ -19,5 +18,5 @@ import { ApiServicesController } from './api_controllers/api_services_controller
 
 new App().server.listen(port, () => { console.log(`⚡️[Neco]: Server is running at http://localhost:${port}`); });
 //#endregion APi Express Config
-export const current_api: CurrentApi = new CurrentApi(new baileys_api());
+//export const current_api: CurrentApi = new CurrentApi(new baileys_api());
 //ApiServicesController.Create_session("Sessão");

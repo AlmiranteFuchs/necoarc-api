@@ -4,7 +4,7 @@ import { home_controller } from './routes_controllers/home';
 import { private_controller } from './routes_controllers/private';
 import { createAuthorizationMiddleware } from "./middleware";
 import { send_simple_message_controller } from './routes_controllers/send_simple_message';
-import { get_QR_controller } from './routes_controllers/get_QR';
+import { session_controller } from './routes_controllers/sessionController';
 
 dotenv.config();
 
@@ -15,6 +15,8 @@ const router: Router = Router();
 router.get('/', home_controller.Home);
 router.get('/private', createAuthorizationMiddleware(secret), private_controller.Private);                                              // Test Route
 router.post('/send_simple_message', createAuthorizationMiddleware(secret), send_simple_message_controller.Send)                         // Message 
-router.get('/get_QR', createAuthorizationMiddleware(secret), get_QR_controller.Get)                                                     // QR 
+router.get('/create_session', createAuthorizationMiddleware(secret), session_controller.Create)                                         // Create Session 
+router.get('/get_QR', createAuthorizationMiddleware(secret), session_controller.GetQR)                                                  // QR 
+router.get('/status', createAuthorizationMiddleware(secret), session_controller.Status)                                                 // Session Status 
 
 export { router };

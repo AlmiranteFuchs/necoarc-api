@@ -1,11 +1,9 @@
-import { API, CommForm } from "../api_services_model";
+import { API, APIStatus, CommForm } from "../api_services_model";
 import dotenv from 'dotenv';
-import axios from "axios";
-import makeWASocket, { DisconnectReason, BufferJSON, useMultiFileAuthState } from '@adiwajshing/baileys';
-import * as fs from 'fs'
-import { Boom } from '@hapi/boom';
-import { ApiServicesController, APIS_TYPES } from "../../api_controllers/api_services_controller";
-import { SignalDataTypeMap, SignalDataSet } from "@adiwajshing/baileys/lib/Types";
+import { ApiServicesController } from "../../api_controllers/api_services_controller";
+import makeWASocket, { DisconnectReason, useMultiFileAuthState } from '@adiwajshing/baileys';
+import { Boom } from '@hapi/boom'
+import rimraf from "rimraf";
 
 dotenv.config();
 
@@ -18,62 +16,69 @@ export class baileys_api implements API {
 
     _api_name?: string | undefined;
     _bot_client: any;
-    _active: boolean;
+    _save_token?: boolean;
     _qr_log: string;
+    _status: APIStatus;
 
-    constructor(api_name?: string) {
-        this._active = false;
+    constructor(api_name?: string, save_token?: boolean) {
+        this._status = APIStatus.inactive;
         this._api_name = api_name ?? baileys_api.name;
+        this._save_token = save_token ?? false;
         this._qr_log = "";
 
         console.log(`⚡️[Neco]: Initializing ${this._api_name} API'`);
+        this._clear_session();
 
-        // API CONFIG
-        this.connectToWhatsApp();
+        // Initialize the API
+        setTimeout(() => {
+            this.connectToWhatsApp();
+        }, 1000);
     }
 
+    // This initializes an instance of the API, the "client" of it, does not save the token
     async connectToWhatsApp() {
-        // This initializes an instance of the API, the "client" of it
+        try {
+            // If there is a token, delete it
 
-        const { state, saveCreds } = await useMultiFileAuthState('auth_info_baileys');
+            const { state, saveCreds } = await useMultiFileAuthState(`auth_info_baileys/${this._api_name as string}`);
+            const sock = makeWASocket({
+                // can provide additional config here
+                auth: state,
+                printQRInTerminal: false
+            } as any);
 
-        const sock = makeWASocket({
-            printQRInTerminal: true,
-            auth: state,
-        } as any);
+            this._bot_client = sock;
 
-        // Defines 
-        this._bot_client = sock;
+            sock.ev.on('creds.update', saveCreds);
 
-        // Log Update
-        sock.ev.on('creds.update', saveCreds);
+            sock.ev.on('connection.update', (update) => {
+                const { connection, lastDisconnect } = update
+                if (connection === 'close') {
+                    this._status = APIStatus.inactive;
+                    const shouldReconnect = (lastDisconnect?.error as Boom)?.output?.statusCode !== DisconnectReason.loggedOut;
 
-        // Conn update Event
-        sock.ev.on('connection.update', (update) => {
-            const { connection, lastDisconnect } = update;
-
-            if (update.qr) {
-                this._qr_log = update.qr;
-            }
-
-            if (connection === 'close') {
-                this._active = false;
-                const shouldReconnect = (lastDisconnect?.error as Boom)?.output?.statusCode !== DisconnectReason.loggedOut;
-                console.log(`[${this._api_name}]: `, 'connection closed due to ', lastDisconnect?.error, ', reconnecting ', shouldReconnect);
-                // reconnect if not logged out
-                if (shouldReconnect) {
-                    this.connectToWhatsApp();
+                    // reconnect if not logged out
+                    if (shouldReconnect) {
+                        console.log('connection closed due to ', lastDisconnect?.error, ', reconnecting ', shouldReconnect);
+                        this.connectToWhatsApp();
+                    } else {
+                        console.log('connection closed due to ', lastDisconnect?.error, ', closing session ', shouldReconnect);
+                        this.close_connection(lastDisconnect?.error);
+                    }
+                } else if (connection === 'open') {
+                    this._status = APIStatus.active;
                 }
-            } else if (connection === 'open') {
-                console.log(`\n\n # [${this._api_name}]: Opened connection # \n\n`);
-                this._active = true;
-            }
-        });
+                if (update.qr) {
+                    this._qr_log = update.qr;
+                    this._status = APIStatus.awaiting_qr;
+                }
+            })
 
-        // On Message Event
-        sock.ev.on('messages.upsert', async m => {
-            //console.log(`[${this._api_name}]: `, JSON.stringify(m, undefined, 2));
-        });
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
     }
 
 
@@ -91,23 +96,61 @@ export class baileys_api implements API {
         //Auxiliar wait
         const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-       /*  if (!this._active) {
+        if (this._status < 1 && !this._save_token) {
             return { result: false, message: "Não é possivel resgatar QR, serviço não iniciado" };
-        } */
-        setTimeout(() => {
-            return { result: false, message: "timeout" };
-        }, 3000);
+        }
+
+        let timeout = 3000;
+        let interval = 200;
 
         let qr: string = "";
         while (!qr) {
-            qr = this._get_qr(); 
-            await sleep(200);
+            if (timeout <= 0) { return { result: false, message: "timeout" }; }
+            qr = this._get_qr();
+            await sleep(interval);
+            timeout -= interval;
         }
 
         return { result: true, message: qr };
     }
 
+
+    async close_connection(motive?: any): Promise<CommForm> {
+        try {
+            console.log(`\n\n # [${this._api_name}]: Closing connection due: ${motive} # \n\n`);
+            ApiServicesController.Remove_session(this._api_name as string);
+
+            await this._bot_client.ws.terminate();
+            await this._bot_client.ws.close();
+            this._clear_session();
+            console.log(`\n[${this._api_name}]: Closed connection\n`);
+
+            return { result: true, message: "Conexão encerrada com sucesso" };
+        } catch (error) {
+            console.log(`\n[${this._api_name}]: Error closing connection: ${error}\n`);
+            return { result: false, message: `Não foi possível encerrar conexão corretamente: ${error}` };
+        }
+    }
+
+    // Getters && private methods
     private _get_qr(): string {
         return this._qr_log;
+    }
+
+    private async _clear_session(): Promise<boolean> {
+        // Forces the deletion of the token file
+        try {
+            rimraf(`auth_info_baileys/${this._api_name as string}`, (err) => {
+                if (err) {
+                    console.log(`\n[${this._api_name}]: Error deleting token file: ${err}\n`);
+                    return false;
+                }
+            });
+            console.log(`\n[${this._api_name}]: Deleted token file\n`);
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
     }
 }
