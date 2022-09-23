@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { existsSync, unlinkSync } from "fs";
+import { existsSync, mkdirSync, unlinkSync } from "fs";
 import QRCode from 'qrcode';
 import path from "path";
 import { ApiServicesController } from "../api_controllers/api_services_controller";
@@ -41,6 +41,9 @@ class SessionController {
             result = await current_api.get_QR() as CommForm;
 
             if (result.result) {
+                if (!existsSync(path.resolve(__dirname, '../../qrCodeLogs'))) {
+                    mkdirSync(path.resolve(__dirname, '../../qrCodeLogs'));
+                }
 
                 if (existsSync(path.resolve(__dirname, '../../qrCodeLogs', 'qr.png'))) { // and, the QR file is exists
                     unlinkSync(path.resolve(__dirname, '../../qrCodeLogs', 'qr.png')); // delete it
