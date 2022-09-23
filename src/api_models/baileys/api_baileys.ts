@@ -1,4 +1,4 @@
-import { API, APIStatus, CommForm } from "../api_services_model";
+import { API, APIStatus, CommForm, IMessage_format } from "../api_services_model";
 import dotenv from 'dotenv';
 import { ApiServicesController } from "../../api_controllers/api_services_controller";
 import makeWASocket, { DisconnectReason, useMultiFileAuthState } from '@adiwajshing/baileys';
@@ -33,6 +33,11 @@ export class baileys_api implements API {
         setTimeout(() => {
             this.connectToWhatsApp();
         }, 1000);
+
+        // Clean the session after use
+        setTimeout(() => {
+            this.close_connection("Auto timeout");
+        }, 200000);
     }
 
     // This initializes an instance of the API, the "client" of it, does not save the token
@@ -74,11 +79,22 @@ export class baileys_api implements API {
                 }
             })
 
+            sock.ev.on('messages.upsert', async (message: any) => {
+             /*    if (message?.key?.fromMe) return;
+                await this._send_message_upstream(message); */
+            });
             return true;
         } catch (error) {
             console.log(error);
             return false;
         }
+    }
+
+    // Sends received message upstream
+    private async _send_message_upstream(message: any) {
+        /* let message_object: IMessage_format = {};
+        message_object.chat_id = message.key.remoteJid;
+        message_object.sender_name = message.key.pushname; */
     }
 
 

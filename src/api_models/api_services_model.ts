@@ -46,3 +46,39 @@ export enum APIStatus {
     awaiting_qr = 1,
     active = 2
 }
+
+// Message format interface for the API
+export interface IMessage_format {
+    //Message
+    id?: string;
+    body?: string;
+    text?: string;
+    /* type?: chat_type; */
+    from?: string;
+    to?: string;
+    isForwarded?: boolean;
+    chat_id?: string;
+    isFrom_group?: boolean;
+    isMedia?: boolean;
+    last_chat_message_id?: string;
+    not_Spam?: boolean;
+    //Sender
+    sender_id?: string;
+    sender_name?: string;
+    sender_number?: string;
+    sender_pfp?: string;
+    //Extra params
+    command_key?: string;
+    command_key_raw?: string;
+    command_params?: Array<string>;
+    specific?: any;
+    //Venom Client
+    client?: any
+}
+
+/* enum chat_type {
+    image = "image",
+    chat = "chat",
+    list_response = "list_response",
+    unknown = "unknown"
+} */
