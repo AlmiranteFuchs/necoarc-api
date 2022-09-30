@@ -12,7 +12,7 @@ class SendSimpleMessageController {
         
         //TODO: interface para validar número "@.us etc"
         if (!phone_number || !text_message || !session_name) {
-            return res.status(400).send("Parâmentros insuficientes ou ausentes, body:" + req.body);
+            return res.status(400).send("Parâmentros insuficientes ou ausentes, body:" + req.body.text_message + req.body.phone_number);
         }
 
         let current_api = ApiServicesController.Get_session(session_name) as CurrentApi;
