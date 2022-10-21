@@ -221,6 +221,11 @@
   "resolved" "https://registry.npmjs.org/@types/node/-/node-10.17.60.tgz"
   "version" "10.17.60"
 
+"@types/qrcode-terminal@^0.12.0":
+  "integrity" "sha512-g0fQKl3IVnUePV8tLkiBTduxAVSZsXts444T2aMfjOEGxd7XoeSIs16/AmRe2NlcJLqbvsOBSXov7dKSo4wigA=="
+  "resolved" "https://registry.npmjs.org/@types/qrcode-terminal/-/qrcode-terminal-0.12.0.tgz"
+  "version" "0.12.0"
+
 "@types/qrcode@^1.5.0":
   "integrity" "sha512-x5ilHXRxUPIMfjtM+1vf/GPTRWZ81nqscursm5gMznJeK9M0YnZ1c3bEvRLQ0zSSgedLx1J6MGL231ObQGGhaA=="
   "resolved" "https://registry.npmjs.org/@types/qrcode/-/qrcode-1.5.0.tgz"
@@ -604,6 +609,11 @@
   "integrity" "sha512-2sJGJTaXIIaR1w4iJSNoN0hnMY7Gpc/n8D4qSCJw8QqFWXf7cuAgnEHxBpweaVcPevC2l3KpjYCx3NypQQgaJg=="
   "resolved" "https://registry.npmjs.org/destroy/-/destroy-1.2.0.tgz"
   "version" "1.2.0"
+
+"devtools-protocol@0.0.1045489":
+  "integrity" "sha512-D+PTmWulkuQW4D1NTiCRCFxF7pQPn0hgp4YyX4wAQ6xYXKOadSWPR3ENGDQ47MW/Ewc9v2rpC/UEEGahgBYpSQ=="
+  "resolved" "https://registry.npmjs.org/devtools-protocol/-/devtools-protocol-0.0.1045489.tgz"
+  "version" "0.0.1045489"
 
 "devtools-protocol@0.0.981744":
   "integrity" "sha512-0cuGS8+jhR67Fy7qG3i3Pc7Aw494sb9yG9QgpG97SFVWwolgYjlhJg7n+UaHxOQT30d1TYu/EYe9k01ivLErIg=="
@@ -1104,9 +1114,9 @@
     "whatwg-url" "^5.0.0"
 
 "node-webpmux@^3.1.0":
-  "integrity" "sha512-vG75BAe9zKghN+Y+XsJMPdOfVyesn1MmGvd/DMxeQ6gtpB3U053yCWXO1Gl2QWXTfU1++7flTihv/yB6EEdtKQ=="
-  "resolved" "https://registry.npmjs.org/node-webpmux/-/node-webpmux-3.1.1.tgz"
-  "version" "3.1.1"
+  "integrity" "sha512-337vJ7dtoGUhE1zoN4s0mWqDO+RLVseShoWAy0FjGx0hsyDEKfVMAkHu4zfNf0RnPyGqGxnRrPZam36ld9KsxA=="
+  "resolved" "https://registry.npmjs.org/node-webpmux/-/node-webpmux-3.1.3.tgz"
+  "version" "3.1.3"
 
 "nodemon@^2.0.19":
   "integrity" "sha512-4pv1f2bMDj0Eeg/MhGqxrtveeQ5/G/UVe9iO6uTZzjnRluSA4PVWf8CW99LUPwGB3eNIA7zUFoP77YuI7hOc0A=="
@@ -1330,6 +1340,22 @@
     "end-of-stream" "^1.1.0"
     "once" "^1.3.1"
 
+"puppeteer-core@19.0.0":
+  "integrity" "sha512-OljQ9W5M4cBX68vnOAGbcRkVENDHn6lfj6QYoGsnLQsxPAh6ExTQAhHauwdFdQkhYdDExZFWlKArnBONzeHY+g=="
+  "resolved" "https://registry.npmjs.org/puppeteer-core/-/puppeteer-core-19.0.0.tgz"
+  "version" "19.0.0"
+  dependencies:
+    "cross-fetch" "3.1.5"
+    "debug" "4.3.4"
+    "devtools-protocol" "0.0.1045489"
+    "extract-zip" "2.0.1"
+    "https-proxy-agent" "5.0.1"
+    "proxy-from-env" "1.1.0"
+    "rimraf" "3.0.2"
+    "tar-fs" "2.1.1"
+    "unbzip2-stream" "1.4.3"
+    "ws" "8.9.0"
+
 "puppeteer@^13.0.0":
   "integrity" "sha512-U1uufzBjz3+PkpCxFrWzh4OrMIdIb2ztzCu0YEPfRHjHswcSwHZswnK+WdsOQJsRV8WeTg3jLhJR4D867+fjsA=="
   "resolved" "https://registry.npmjs.org/puppeteer/-/puppeteer-13.7.0.tgz"
@@ -1347,6 +1373,16 @@
     "tar-fs" "2.1.1"
     "unbzip2-stream" "1.4.3"
     "ws" "8.5.0"
+
+"puppeteer@^19.0.0":
+  "integrity" "sha512-3Ga5IVerQQ2hKU9q7T28RmcUsd8F2kL6cYuPcPCzeclSjmHhGydPBZL/KJKC02sG6J6Wfry85uiWpbkjQ5qBiw=="
+  "resolved" "https://registry.npmjs.org/puppeteer/-/puppeteer-19.0.0.tgz"
+  "version" "19.0.0"
+  dependencies:
+    "https-proxy-agent" "5.0.1"
+    "progress" "2.0.3"
+    "proxy-from-env" "1.1.0"
+    "puppeteer-core" "19.0.0"
 
 "qrcode-terminal@^0.12.0":
   "integrity" "sha512-EXtzRZmC+YGmGlDFbXKxQiMZNwCLEO6BANKXG4iCtSIM0yqc/pappSx3RIKr4r0uh5JsBckOXeKrB3Iz7mdQpQ=="
@@ -1762,7 +1798,12 @@
   "resolved" "https://registry.npmjs.org/wrappy/-/wrappy-1.0.2.tgz"
   "version" "1.0.2"
 
-"ws@^8.0.0", "ws@8.5.0":
+"ws@^8.0.0", "ws@8.9.0":
+  "integrity" "sha512-Ja7nszREasGaYUYCI2k4lCKIRTt+y7XuqVoHR44YpI49TtryyqbqvDMn5eqfW7e6HzTukDRIsXqzVHScqRcafg=="
+  "resolved" "https://registry.npmjs.org/ws/-/ws-8.9.0.tgz"
+  "version" "8.9.0"
+
+"ws@8.5.0":
   "integrity" "sha512-BWX0SWVgLPzYwF8lTzEy1egjhS4S4OEAHfsO8o65WOVsrnSRGaSiUaa9e0ggGlkMTtBlmOpEXiie9RUcBO86qg=="
   "resolved" "https://registry.npmjs.org/ws/-/ws-8.5.0.tgz"
   "version" "8.5.0"
