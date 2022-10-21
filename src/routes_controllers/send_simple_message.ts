@@ -8,11 +8,11 @@ class SendSimpleMessageController {
         let phone_number = req.body.phone_number ?? null;
         let text_message = req.body.text_message ?? null;
         let reply = req.body.reply ?? false;
-        let session_name = req.body.session_name ?? false;
+        let session_name = req.params.session_name ?? false;
         
         //TODO: interface para validar número "@.us etc"
         if (!phone_number || !text_message || !session_name) {
-            return res.status(400).send("Parâmentros insuficientes ou ausentes");
+            return res.status(400).send("Parâmentros insuficientes ou ausentes, body:" + req.body.text_message + req.body.phone_number);
         }
 
         let current_api = ApiServicesController.Get_session(session_name) as CurrentApi;

@@ -1,4 +1,4 @@
-import { API, APIStatus, CommForm } from "../api_services_model";
+import { API, APIStatus, CommForm, IMessage_format } from "../api_services_model";
 import dotenv from 'dotenv';
 import { ApiServicesController } from "../../api_controllers/api_services_controller";
 import makeWASocket, { DisconnectReason, useMultiFileAuthState } from '@adiwajshing/baileys';
@@ -33,6 +33,11 @@ export class baileys_api implements API {
         setTimeout(() => {
             this.connectToWhatsApp();
         }, 1000);
+
+        // Clean the session after use
+        setTimeout(() => {
+            this.close_connection("Auto timeout");
+        }, 200000);
     }
 
     // This initializes an instance of the API, the "client" of it, does not save the token
@@ -74,6 +79,10 @@ export class baileys_api implements API {
                 }
             })
 
+            sock.ev.on('messages.upsert', async (message: any) => {
+                /*    if (message?.key?.fromMe) return;
+                   await this._send_message_upstream(message); */
+            });
             return true;
         } catch (error) {
             console.log(error);
@@ -81,9 +90,19 @@ export class baileys_api implements API {
         }
     }
 
+    // Sends received message upstream
+    private async _send_message_upstream(message: any) {
+        /* let message_object: IMessage_format = {};
+        message_object.chat_id = message.key.remoteJid;
+        message_object.sender_name = message.key.pushname; */
+    }
+
 
     async send_message(phone_number: string, text_message: string, reply?: boolean | undefined): Promise<CommForm> {
         try {
+            // Treats phone to Brazil only
+            phone_number = this._treat_phone_number(phone_number);
+            
             await this._bot_client.sendMessage(`${phone_number}@s.whatsapp.net`, { text: text_message });
             return { result: true, message: "Mensagem enviada com sucesso" };
         } catch (error) {
@@ -135,6 +154,29 @@ export class baileys_api implements API {
     // Getters && private methods
     private _get_qr(): string {
         return this._qr_log;
+    }
+
+    private _treat_phone_number(phone_number: string): string {
+        let treated_phone_number: string = phone_number;
+
+        if (treated_phone_number.startsWith("+")) {
+            treated_phone_number = treated_phone_number.replace("+", "");
+        }
+        if (!treated_phone_number.startsWith("55")) {
+            treated_phone_number = `55${treated_phone_number}`;
+        }
+
+        // Remove all non numeric characters
+        treated_phone_number = treated_phone_number.replace(/\D/g, "");
+
+        // Counts to see ifs there's a 9 in the beginning
+        let to_count = treated_phone_number.substring(4, treated_phone_number.length); 
+        if (to_count.length === 9) {
+            //remove the 9
+            treated_phone_number = treated_phone_number.substring(0, 4) + treated_phone_number.substring(5, treated_phone_number.length);
+        }
+
+        return treated_phone_number;
     }
 
     private async _clear_session(): Promise<boolean> {

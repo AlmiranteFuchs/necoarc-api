@@ -1,26 +1,27 @@
 {
-    "messages": [
-      {
-        "key": {
-          "remoteJid": "554498579172@s.whatsapp.net",
-          "fromMe": false,
-          "id": "3EB0AF0DF4DF8F01950A"
-        },
-        "messageTimestamp": 1662085954,
-        "pushName": "Almirante Fuchs",
-        "message": {
-          "conversation": "aa",
-          "messageContextInfo": {
-            "deviceListMetadata": {
-              "senderKeyHash": "W50TynWglR2aaw==",
-              "senderTimestamp": "1661275867",
-              "recipientKeyHash": "eo7F7GkgR1zIPw==",
-              "recipientTimestamp": "1661529902"
-            },
-            "deviceListMetadataVersion": 2
+  "messages": [
+    {
+      "key": {
+        "remoteJid": "5541936180244@s.whatsapp.net",
+        "fromMe": true,
+        "id": "1F22A7218F446E31AD9BDE90F13F80C6"
+      },
+      "messageTimestamp": 1663550897,
+      "pushName": "Cassioh🤖",
+      "status": 2,
+      "message": {
+        "protocolMessage": {
+          "type": "HISTORY_SYNC_NOTIFICATION",
+          "historySyncNotification": {
+            "fileSha256": "YhQb150EqWObgybBebLHbXxlwrziYHPhEg5yCfEAeE4=",
+            "fileLength": "290",
+            "mediaKey": "SgqWd5IceS4IhJoYJTlnC0SPADF1MwtTb7AZF1GTNk0=",
+            "fileEncSha256": "gkHkWrYmHDrVvhsEk9RdbPxPQUFMArLXRbGZe9K4Ktk=",
+            "directPath": "/v/t62.31111-24/31835590_1996134057249131_6777006498979021339_n.enc?ccb=11-4&oh=01_AVz6_ucRFw5Qd76YaE4sfE1MNWHpgcjDD6Q7Re8vyvvH2Q&oe=634E1AF4"
           }
         }
       }
-    ],
-    "type": "notify"
-  }
+    }
+  ],
+  "type": "notify"
+}
