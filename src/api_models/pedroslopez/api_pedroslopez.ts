@@ -44,7 +44,7 @@ export class pedroslopez_api implements API {
   async connectToWhatsApp() {
     const client = new Client({
       authStrategy: new LocalAuth({ clientId: this._api_name }),
-      puppeteer: { headless: false, executablePath: 'C:/Program Files/MozillaFirefox/firefox.exe', args: ['--no-sandbox'] },
+      puppeteer: { headless: true },
       /*  userAgent: "Chrome", */
     });
     this._bot_client = client;
@@ -56,46 +56,57 @@ export class pedroslopez_api implements API {
       qrcode.generate(qr, { small: true });
     });
 
+    // Status
     client.on("ready", () => {
       this._status = APIStatus.active;
-      console.log(`⚡️[Neco]: Client is ready! nya~`);
+      console.log(`⚡️[Neco]: ${this._api_name} Client is ready! nya~`);
     });
     client.on("authenticated", () => {
-      console.log("⚡️[Neco]: AUTHENTICATED");
+      console.log(`⚡️[Neco]: ${this._api_name} AUTHENTICATED`);
     });
     client.on("auth_failure", (msg) => {
-      // Fired if session restore was unsuccessful
-      console.error("⚡️[Neco]: AUTHENTICATION FAILURE", msg);
-    });
-
-    client.on("message_ack", function (msg: any) {
-      console.log(`⚡️[Neco]: Message received! nya~`);
-      console.log(msg);
-    });
-    client.on("message", function (msg: any) {
-      console.log(`⚡️[Neco]: Message received! nya~`);
-      console.log(msg);
-    });
-    client.on("message_create", (msg) => {
-      console.log(`⚡️[Neco]: Message received! nya~`);
-      console.log(msg);
-    });
-
-    client.on("disconnected", (reason) => {
-      console.log("⚡️[Neco]: Client was logged out", reason);
       this._status = APIStatus.inactive;
+      console.error(`⚡️[Neco]: ${this._api_name} AUTHENTICATION FAILURE`, msg);
+    });
+    client.on("disconnected", (reason) => {
+      console.log(`⚡️[Neco]: ${this._api_name} Client was logged out`, reason);
+      this._status = APIStatus.inactive;
+    });
+
+    // Action Events
+    client.on("message", (msg: any) => {
+      console.log(`⚡️[Neco]: ${this._api_name} Message received! nya~`);
+      // TODO: Implement the message handler
     });
 
     client.initialize();
   }
 
-  send_message(
+  // Mandatory methods
+  async send_message(
     phone_number: string,
     text_message: string,
     reply?: boolean | undefined
   ): Promise<CommForm> {
-    throw new Error("Method not implemented.");
+    try {
+      let msg = this._bot_client.sendMessage(
+        this.format_number(phone_number),
+        text_message
+      );
+
+      return Promise.resolve({
+        result: true,
+        message: `Message sent: ${JSON.stringify(msg)}`,
+      });
+    } catch (error) {
+      console.log(`⚡️[Neco]: Error sending message nya!: ${error}`);
+      return Promise.reject({
+        result: false,
+        message: `Error sending message ${error}`,
+      });
+    }
   }
+
   get_qrCode(): Promise<CommForm> {
     if (this._status == APIStatus.awaiting_qr) {
       return Promise.resolve({
@@ -108,7 +119,17 @@ export class pedroslopez_api implements API {
       message: this._qr_log,
     });
   }
+
   close_connection(): Promise<CommForm> {
     throw new Error("Method not implemented.");
+  }
+
+  // Private methods
+  private format_number(phone_number: string): string {
+    // If doens't end with @c.us
+    if (!phone_number.endsWith("@c.us")) {
+      return phone_number + "@c.us";
+    }
+    return phone_number;
   }
 }
