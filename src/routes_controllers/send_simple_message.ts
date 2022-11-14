@@ -20,6 +20,14 @@ class SendSimpleMessageController {
             return res.status(400).send(`Sessão ${session_name} não encontrada`);
         }
 
+        let status = ApiServicesController.Get_session_status(session_name).status;
+
+        console.log(status);
+        
+        if (status < 2) {
+            return res.status(400).send(`Sessão ${session_name} não disponível`);
+        }
+
 
         let result: CommForm = {} as CommForm;
 
