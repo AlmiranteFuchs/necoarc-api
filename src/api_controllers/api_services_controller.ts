@@ -24,7 +24,7 @@ export abstract class ApiServicesController {
       // Verifica se já existe uma sessão com o mesmo nome
       let current_api: CurrentApi | boolean = this.Get_session(_session_name);
       if (!current_api) {
-        current_api = new CurrentApi(new pedroslopez_api(_session_name)); //FIXME: Dynamic API types
+        current_api = new CurrentApi(new baileys_api(_session_name)); //FIXME: Dynamic API types
         this.Push_session(current_api);
         console.log(`⚡️[Neco]: Sessão criada: ${_session_name}`);
         return true;

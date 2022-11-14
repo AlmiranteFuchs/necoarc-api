@@ -5,7 +5,6 @@ import {
   IMessage_format,
 } from "../api_services_model";
 import { Client, LocalAuth } from "whatsapp-web.js";
-
 import qrcode from "qrcode-terminal";
 
 export class pedroslopez_api implements API {
@@ -31,7 +30,12 @@ export class pedroslopez_api implements API {
 
     // Initialize the API
     setTimeout(() => {
-      this.connectToWhatsApp();
+      try {
+        this.connectToWhatsApp();
+      } catch (error) {
+        console.log(`⚡️[Neco]: Error initializing ${this._api_name} API'`);
+        this._status = APIStatus.inactive;
+      }
     }, 1000);
 
     // Clean the session after use
@@ -76,7 +80,10 @@ export class pedroslopez_api implements API {
     // Action Events
     client.on("message", (msg: any) => {
       console.log(`⚡️[Neco]: ${this._api_name} Message received! nya~`);
-      // TODO: Implement the message handler
+      // Parse the message
+      msg = this.parse_message(msg as IWaWebMessage);
+      // Broadcast the message TODO: Implement this
+      //this._bot_client.emit("message", msg);
     });
 
     client.initialize();
@@ -124,6 +131,29 @@ export class pedroslopez_api implements API {
     throw new Error("Method not implemented.");
   }
 
+  parse_message(msg: IWaWebMessage): Promise<IMessage_format> {
+    let message: IMessage_format = {
+      id: msg.id.id,
+      from:msg.from,
+      to: msg.to,
+      body: msg.body,
+      text: msg._data.body,
+      chat_id:msg.id.remote,
+      client_name: this._api_name,
+      command: msg.body.split(" ")[0].split("/")[1],
+      command_key_raw: msg.body.split(" ")[0],
+      command_key: msg.body.split(" ")[0].split("/")[1],
+      command_params: msg.body.split(" ").slice(1,4),
+      isForwarded: msg.isForwarded,
+      isFrom_group: msg.author != undefined,
+      // TODO: is midia
+      sender_name: msg._data.notifyName,
+      timestamp: msg.timestamp,
+      
+    } as IMessage_format;
+    return Promise.resolve(message);
+  }
+
   // Private methods
   private format_number(phone_number: string): string {
     // If doens't end with @c.us
@@ -132,4 +162,85 @@ export class pedroslopez_api implements API {
     }
     return phone_number;
   }
+}
+
+// Message Interface
+interface IWaWebMessage {
+  _data: {
+    id: {
+      fromMe: boolean;
+      remote: string; // 554498579172@c.us;
+      id: string; // 9103F1791E8FD8EEF4;
+      _serialized: string; // false_554498579172@c.us_9103F1791E8FD8EEF4
+    };
+    body: string; // "Hello world"
+    type: string; // chat;
+    t: number; // 1668313468;
+    notifyName: string; // Almirante Fuchs;
+    from: string; // 554498579172@c.us;
+    to: string; // 5541936180244@c.us;
+    self: string; // in;
+    ack: number; //  1;
+    isNewMsg: boolean; //  true;
+    star: boolean; // false;
+    kicNotified: boolean; // false;
+    recvFresh: boolean; // true;
+    isFromTemplate: boolean; // false;
+    thumbnail: string; // "";
+    pollInvalidated: boolean; // false;
+    latestEditMsgKey: any; // null;
+    latestEditSenderTimestampMs: any; // null;
+    broadcast: boolean; // false;
+    mentionedJidList: any[]; // [];
+    isVcardOverMmsDocument: boolean; // false;
+    hasReaction: boolean; // false;
+    ephemeralDuration: number; // 0;
+    ephemeralSettingTimestamp: number; // 0;
+    ephemeralOutOfSync: boolean; // false;
+    disappearingModeInitiator: string; // chat;
+    productHeaderImageRejected: boolean; // false;
+    lastPlaybackProgress: number; // 0;
+    isDynamicReplyButtonsMsg: boolean; // false;
+    isMdHistoryMsg: boolean; // false;
+    stickerSentTs: number; // 0;
+    isAvatar: boolean; // false;
+    requiresDirectConnection: boolean; // false;
+    pttForwardedFeaturesEnabled: true;
+    isEphemeral: boolean; // false;
+    isStatusV3: boolean; // false;
+    links: any[]; // [];
+  };
+  mediaKey: any; // undefined;
+  id: {
+    fromMe: false;
+    remote: string; // 554498579172@c.us;
+    id: string; // 9103F1791E8FD8EEF4;
+    _serialized: string; // false_554498579172@c.us_9103F1791E8FD8EEF4
+  };
+  ack: number; // 1;
+  hasMedia: boolean; // false;
+  body: string; // aa;
+  type: string; // chat;
+  timestamp: number; // 1668313468;
+  from: string; // 554498579172@c.us;
+  to: string; // 5541936180244@c.us;
+  author: any; //undefined;
+  deviceType: string; // web;
+  isForwarded: any; // undefined;
+  forwardingScore: number; // 0;
+  isStatus: boolean; // false;
+  isStarred: boolean; // false;
+  broadcast: boolean; // false;
+  fromMe: boolean; // false;
+  hasQuotedMsg: boolean; // false;
+  duration: any; // undefined;
+  location: any; // undefined;
+  vCards: any[]; // [];
+  inviteV4: any; // undefined;
+  mentionedIds: any[]; // [];
+  orderId: any; // undefined;
+  token: any; // undefined;
+  isGif: boolean; // false;
+  isEphemeral: boolean; // false;
+  links: any[]; // []
 }

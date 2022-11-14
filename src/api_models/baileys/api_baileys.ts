@@ -40,6 +40,11 @@ export class baileys_api implements API {
         }, 200000);
     }
 
+    // Parses the phone number to Brazil only
+    parse_message(msg: any): Promise<IMessage_format> {
+        throw new Error("Method not implemented.");
+    }
+
     // This initializes an instance of the API, the "client" of it, does not save the token
     async connectToWhatsApp() {
         try {
@@ -137,11 +142,16 @@ export class baileys_api implements API {
     async close_connection(motive?: any): Promise<CommForm> {
         try {
             console.log(`\n\n # [${this._api_name}]: Closing connection due: ${motive} # \n\n`);
-            ApiServicesController.Remove_session(this._api_name as string);
+            this._status = 0;
 
             await this._bot_client.ws.terminate();
             await this._bot_client.ws.close();
-            this._clear_session();
+
+            setTimeout(() => {
+                this._clear_session();
+            }, 7000);
+
+            ApiServicesController.Remove_session(this._api_name as string);
             console.log(`\n[${this._api_name}]: Closed connection\n`);
 
             return { result: true, message: "Conexão encerrada com sucesso" };

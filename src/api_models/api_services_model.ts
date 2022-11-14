@@ -48,6 +48,7 @@ export interface API {
   ): Promise<CommForm>;
   get_qrCode(): Promise<CommForm>;
   close_connection(): Promise<CommForm>;
+  parse_message(msg: any): Promise<IMessage_format>;
 }
 
 export interface CommForm {
@@ -76,6 +77,7 @@ export interface IMessage_format {
   isMedia?: boolean;
   last_chat_message_id?: string;
   not_Spam?: boolean;
+  timestamp?: number | string;
   //Sender
   sender_id?: string;
   sender_name?: string;
@@ -87,7 +89,7 @@ export interface IMessage_format {
   command_params?: Array<string>;
   specific?: any;
   //Venom Client
-  client?: any;
+  client_name?: any;
 }
 
 /* enum chat_type {
