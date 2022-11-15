@@ -6,6 +6,7 @@ import {
 } from "../api_services_model";
 import { Client, LocalAuth } from "whatsapp-web.js";
 import qrcode from "qrcode-terminal";
+import axios from "axios";
 
 export class pedroslopez_api implements API {
   /*
@@ -18,15 +19,16 @@ export class pedroslopez_api implements API {
   _save_token?: boolean;
   _qr_log: string;
   _status: APIStatus;
+  _broadcast_url: string;
 
-  constructor(api_name?: string, save_token?: boolean) {
+  constructor(api_name?: string, save_token?: boolean, broadcast_url?: string) {
     this._status = APIStatus.inactive;
     this._api_name = api_name ?? pedroslopez_api.name;
     this._save_token = save_token ?? false;
+    this._broadcast_url = broadcast_url ?? ""; // No broadcast url, send only session;
     this._qr_log = "";
 
-    console.log(`⚡️[Neco]: Initializing ${this._api_name} API'`);
-    /* this._clear_session(); */
+    console.log(`⚡️[Neco]: Initializing ${this._api_name} API, broadcast url: ${this._broadcast_url}`);
 
     // Initialize the API
     setTimeout(() => {
@@ -78,18 +80,61 @@ export class pedroslopez_api implements API {
     });
 
     // Action Events
-    client.on("message", (msg: any) => {
+    client.on("message", async (msg: any) => {
       console.log(`⚡️[Neco]: ${this._api_name} Message received! nya~`);
-      // Parse the message
-      msg = this.parse_message(msg as IWaWebMessage);
-      // Broadcast the message TODO: Implement this
-      //this._bot_client.emit("message", msg);
+      msg = (await this.parse_message(msg as IWaWebMessage)) as IMessage_format;
+
+      let result: CommForm = await this.broadcast_message(msg);
+      if (result.result) {
+        console.log(`⚡️[Neco]: ${this._api_name} Message broadcasted! nya~`);
+      }
+      console.log(
+        `⚡️[Neco]: ${this._api_name} Error broadcasting message! nya~ motive: ${result.message}`
+      );
     });
 
     client.initialize();
   }
 
-  // Mandatory methods
+  //**# API Methods - Implementation  #**//
+
+  // Broadcasts the message to session URL
+  async broadcast_message(msg: IMessage_format): Promise<CommForm> {
+    let response: CommForm = {
+      result: false,
+      message: "Send only session",
+    };
+
+    if (this._broadcast_url != "") {
+      console.log(msg);
+
+      await axios
+        .post(this._broadcast_url, { message: msg })
+        .then((res) => {
+          // Check status
+          if (res.status == 200) {
+            response.result = true;
+            response.message = "Message sent";
+
+            return Promise.resolve(response);
+          } else {
+            response.result = false;
+            response.message = "Error sending message, response: " + res.data;
+
+            return Promise.resolve(response);
+          }
+        })
+        .catch((error) => {
+          response.result = false;
+          response.message = "Error sending message, error: " + error;
+
+          return Promise.resolve(response);
+        });
+    }
+    return Promise.resolve(response);
+  }
+
+  // Sends message to given number
   async send_message(
     phone_number: string,
     text_message: string,
@@ -114,6 +159,31 @@ export class pedroslopez_api implements API {
     }
   }
 
+  // Parses specific message data to interface
+  async parse_message(msg: IWaWebMessage): Promise<IMessage_format> {
+    let message: IMessage_format = {
+      id: msg.id.id,
+      from: msg.from,
+      to: msg.to,
+      body: msg.body,
+      text: msg._data.body,
+      chat_id: msg.id.remote,
+      client_name: this._api_name,
+      command: msg.body.split(" ")[0].split("/")[1],
+      command_key_raw: msg.body.split(" ")[0],
+      command_key: msg.body.split(" ")[0].split("/")[1],
+      command_params: msg.body.split(" ").slice(1, 4),
+      isForwarded: msg.isForwarded,
+      isFrom_group: msg.author != undefined,
+      // TODO: is midia
+      sender_name: msg._data.notifyName,
+      timestamp: msg.timestamp,
+    } as IMessage_format;
+    return Promise.resolve(message);
+  }
+
+  //**# Session Methods - Implementation  #**//
+  // Returns QRCode of the session
   get_qrCode(): Promise<CommForm> {
     if (this._status == APIStatus.awaiting_qr) {
       return Promise.resolve({
@@ -127,34 +197,12 @@ export class pedroslopez_api implements API {
     });
   }
 
+  // Removes the session from data structure
   close_connection(): Promise<CommForm> {
     throw new Error("Method not implemented.");
   }
 
-  parse_message(msg: IWaWebMessage): Promise<IMessage_format> {
-    let message: IMessage_format = {
-      id: msg.id.id,
-      from:msg.from,
-      to: msg.to,
-      body: msg.body,
-      text: msg._data.body,
-      chat_id:msg.id.remote,
-      client_name: this._api_name,
-      command: msg.body.split(" ")[0].split("/")[1],
-      command_key_raw: msg.body.split(" ")[0],
-      command_key: msg.body.split(" ")[0].split("/")[1],
-      command_params: msg.body.split(" ").slice(1,4),
-      isForwarded: msg.isForwarded,
-      isFrom_group: msg.author != undefined,
-      // TODO: is midia
-      sender_name: msg._data.notifyName,
-      timestamp: msg.timestamp,
-      
-    } as IMessage_format;
-    return Promise.resolve(message);
-  }
-
-  // Private methods
+  //**# - Utils #**//
   private format_number(phone_number: string): string {
     // If doens't end with @c.us
     if (!phone_number.endsWith("@c.us")) {

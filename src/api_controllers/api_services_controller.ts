@@ -18,13 +18,14 @@ export abstract class ApiServicesController {
   }
 
   public static Create_session(
-    _session_name: string /* , _choosenApi: CurrentApi */
+    _session_name: string,
+    _broadcast_url: string
   ): boolean {
     try {
       // Verifica se já existe uma sessão com o mesmo nome
       let current_api: CurrentApi | boolean = this.Get_session(_session_name);
       if (!current_api) {
-        current_api = new CurrentApi(new baileys_api(_session_name)); //FIXME: Dynamic API types
+        current_api = new CurrentApi(new pedroslopez_api(_session_name, false, _broadcast_url)); //FIXME: Dynamic API types
         this.Push_session(current_api);
         console.log(`⚡️[Neco]: Sessão criada: ${_session_name}`);
         return true;

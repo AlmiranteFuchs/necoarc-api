@@ -15,7 +15,7 @@ const router: Router = Router();
 router.get('/', home_controller.Home);
 router.get('/private/:session_name', createAuthorizationMiddleware(secret), private_controller.Private);                                              // Test Route
 router.post('/send_simple_message/:session_name', createAuthorizationMiddleware(secret), send_simple_message_controller.Send)                         // Message 
-router.get('/create_session/:session_name', createAuthorizationMiddleware(secret), session_controller.Create)                                         // Create Session 
+router.post('/create_session/:session_name', createAuthorizationMiddleware(secret), session_controller.Create)                                         // Create Session 
 router.get('/get_QR/:session_name', createAuthorizationMiddleware(secret), session_controller.GetQR)                                                  // QR 
 router.get('/status/:session_name', createAuthorizationMiddleware(secret), session_controller.Status)                                     // Session Status 
 

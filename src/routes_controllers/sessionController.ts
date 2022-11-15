@@ -9,11 +9,12 @@ class SessionController {
     public async Create(req: Request, res: Response) {
 
         let session_name = req.params.session_name ?? false;
+        let broadcast_url = req.body.broadcast_url ?? "";
 
         if (!session_name) { return res.status(400).send("Parâmentros insuficientes ou ausentes") }
 
         try {
-            let result = ApiServicesController.Create_session(session_name);
+            let result = ApiServicesController.Create_session(session_name, broadcast_url);
 
             if (result) { return res.status(200).send("Sessão criada com sucesso"); }
 

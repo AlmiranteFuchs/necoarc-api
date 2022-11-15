@@ -40,15 +40,20 @@ export interface API {
   _save_token?: boolean;
   _qr_log: string;
   _status: APIStatus;
+  _broadcast_url: string;
 
+  // Mandatory methods
   send_message(
     phone_number: string,
     text_message: string,
     reply?: boolean
   ): Promise<CommForm>;
+  parse_message(msg: any): Promise<IMessage_format>;
+  broadcast_message(msg: IMessage_format): Promise<CommForm>;  
+
+  // Session Methods
   get_qrCode(): Promise<CommForm>;
   close_connection(): Promise<CommForm>;
-  parse_message(msg: any): Promise<IMessage_format>;
 }
 
 export interface CommForm {
