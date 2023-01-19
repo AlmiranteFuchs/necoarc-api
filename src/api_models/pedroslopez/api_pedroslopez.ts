@@ -2,11 +2,12 @@ import {
   API,
   APIStatus,
   CommForm,
-  IMessage_format,
 } from "../api_services_model";
 import { Client, LocalAuth } from "whatsapp-web.js";
 import qrcode from "qrcode-terminal";
 import axios from "axios";
+import { IContact_format, IGroup_format, IMessage_format } from "../message_format";
+import { ApiServicesController } from "../../api_controllers/api_services_controller";
 
 export class pedroslopez_api implements API {
   /*
@@ -46,6 +47,7 @@ export class pedroslopez_api implements API {
     }, 200000); */
   }
 
+
   // This initializes an instance of the API, the "client" of it, does not save the token
   async connectToWhatsApp() {
     const client = new Client({
@@ -75,18 +77,30 @@ export class pedroslopez_api implements API {
       console.error(`⚡️[Neco]: ${this._api_name} AUTHENTICATION FAILURE`, msg);
     });
     client.on("disconnected", (reason) => {
-      console.log(`⚡️[Neco]: ${this._api_name} Client was logged out`, reason);
+      console.log(`⚡️[Neco]: ${this._api_name} Client was logged out reason: ${reason}, removing from list`);
       this._status = APIStatus.inactive;
+
+      this.close_connection();
     });
 
     // Action Events
     client.on("message", async (msg: any) => {
       console.log(`⚡️[Neco]: ${this._api_name} Message received! nya~`);
+
+      let group = await msg.getChat();
+      let sender = await msg.getContact();
+
       msg = (await this.parse_message(msg as IWaWebMessage)) as IMessage_format;
+      group = (await this.parse_group(group as IWaWebGroup)) as IGroup_format;
+      sender = (await this.parse_contact(sender as IWaWebContact)) as IContact_format;
+
+      msg.group = group;
+      msg.contacts = sender;
 
       let result: CommForm = await this.broadcast_message(msg);
       if (result.result) {
         console.log(`⚡️[Neco]: ${this._api_name} Message broadcasted! nya~`);
+        return;
       }
       console.log(
         `⚡️[Neco]: ${this._api_name} Error broadcasting message! nya~ motive: ${result.message}`
@@ -159,6 +173,14 @@ export class pedroslopez_api implements API {
     }
   }
 
+  // Gets the 
+  async get_group_participants(group_id: string): Promise<CommForm> {
+    //let chat = await this._bot_client.getChatById("120363041877741739@g.us");
+    //console.log(chat.participants);
+    throw new Error("Method not implemented.");
+    return Promise.resolve({ result: true, message: "" });
+  }
+
   // Parses specific message data to interface
   async parse_message(msg: IWaWebMessage): Promise<IMessage_format> {
     let message: IMessage_format = {
@@ -169,17 +191,51 @@ export class pedroslopez_api implements API {
       text: msg._data.body,
       chat_id: msg.id.remote,
       client_name: this._api_name,
-      command: msg.body.split(" ")[0].split("/")[1],
       command_key_raw: msg.body.split(" ")[0],
       command_key: msg.body.split(" ")[0].split("/")[1],
       command_params: msg.body.split(" ").slice(1, 4),
       isForwarded: msg.isForwarded,
       isFrom_group: msg.author != undefined,
+      _serialized_chat_id: msg.id._serialized,
       // TODO: is midia
       sender_name: msg._data.notifyName,
       timestamp: msg.timestamp,
     } as IMessage_format;
     return Promise.resolve(message);
+  }
+
+  async parse_contact(contact: IWaWebContact): Promise<IContact_format> {
+    let contact_data: IContact_format = {
+      id: contact.id._serialized,
+      name: contact.name,
+      number: contact.id.user,
+      isBusiness: contact.isBusiness,
+      isMe: contact.isMe,
+      isMyContact: contact.isMyContact,
+      isWAContact: contact.isWAContact,
+      isEnterprise: contact.isEnterprise,
+      isBlocked: contact.isBlocked,
+      isOnline: true,
+      formattedName: contact.pushname,
+      pushname: contact.pushname
+    } as IContact_format;
+    return Promise.resolve(contact_data);
+  }
+
+  async parse_group(group: IWaWebGroup): Promise<IGroup_format> {
+    let group_data: IGroup_format = {
+      group_id: group.id._serialized,
+      group_name: group.name,
+      group_isOpen: group.isGroup,
+      group_creation: group.groupMetadata.creation,
+      group_owner: group.groupMetadata.owner._serialized,
+      group_description: group.groupMetadata.subject,
+      group_participants: group.groupMetadata.participants,
+      group_read_only: group.isReadOnly,
+      group_size: group.groupMetadata.size,
+
+    } as IGroup_format;
+    return Promise.resolve(group_data);
   }
 
   //**# Session Methods - Implementation  #**//
@@ -199,17 +255,103 @@ export class pedroslopez_api implements API {
 
   // Removes the session from data structure
   close_connection(): Promise<CommForm> {
-    throw new Error("Method not implemented.");
+    ApiServicesController.Remove_session(this._api_name as string);
+    return Promise.resolve({
+      result: true,
+      message: "Connection closed, I hope so lol",
+    });
   }
 
   //**# - Utils #**//
   private format_number(phone_number: string): string {
     // If doens't end with @c.us
-    if (!phone_number.endsWith("@c.us")) {
+    if (!phone_number.endsWith("@c.us") && !phone_number.endsWith("@g.us")) {
       return phone_number + "@c.us";
     }
     return phone_number;
   }
+}
+
+
+// Group Interface 
+interface IWaWebGroup {
+  groupMetadata: {
+    id: {
+      server: string; //'g.us',
+      user: string; //'120363041877741739',
+      _serialized: string; //'120363041877741739@g.us'
+    },
+    creation: number; // 1650564976,
+    owner: {
+      server: string; //'c.us',
+      user: string; //'554498579172',
+      _serialized: string; //'554498579172@c.us'
+    },
+    subject: string; //'Teste Cassioh',
+    subjectTime: number; // 1650564976,
+    descTime: number; // 0,
+    restrict: boolean; // false,
+    announce: boolean; // false,
+    noFrequentlyForwarded: boolean; // false,
+    ephemeralDuration: number; // 0,
+    membershipApprovalMode: boolean; // false,
+    size: 2,
+    support: boolean; // false,
+    suspended: boolean; // false,
+    terminated: boolean; // false,
+    uniqueShortNameMap: {},
+    isParentGroup: boolean; // false,
+    isParentGroupClosed: boolean; // false,
+    defaultSubgroup: boolean; // false,
+    lastActivityTimestamp: number; // 0,
+    lastSeenActivityTimestamp: number; // 0,
+    incognito: boolean; // false,
+    participants: [[Object], [Object]],
+    pendingParticipants: [],
+    pastParticipants: [],
+    membershipApprovalRequests: []
+  },
+  id: {
+    server: string; //'g.us',
+    user: string; //'120363041877741739',
+    _serialized: string; //'120363041877741739@g.us'
+  },
+  name: string; //'Teste Cassioh',
+  isGroup: true,
+  isReadOnly: boolean; // false,
+  unreadCount: number; // 0,
+  timestamp: number; // 1668741008,
+  archived: undefined,
+  pinned: boolean; // false,
+  isMuted: boolean; // false,
+  muteExpiration: number; // 0
+}
+
+// Contact Interface
+interface IWaWebContact {
+  id: {
+    server: string; // 'c.us',
+    user: string; // '554498579172',
+    _serialized: string; // '554498579172@c.us'
+  },
+  number: string; // '554498579172',
+  isBusiness: boolean; // false,
+  isEnterprise: boolean; // false,
+  labels: undefined,
+  name: string; // 'Almirante Fuchs',
+  pushname: string; // 'Almirante Fuchs',
+  sectionHeader: undefined,
+  shortName: string; // 'Almirante',
+  statusMute: undefined,
+  type: string; // 'in',
+  verifiedLevel: undefined,
+  verifiedName: undefined,
+  isMe: boolean; // false,
+  isUser: boolean; // true,
+  isGroup: boolean; // false,
+  isWAContact: boolean; // true,
+  isMyContact: boolean; // true,
+  isBlocked: boolean; // false
 }
 
 // Message Interface

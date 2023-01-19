@@ -41,7 +41,7 @@ class SessionController {
         try {
             result = await current_api.get_QR() as CommForm;
 
-            if (result.result) {
+           /*  if (result.result) {
                 if (!existsSync(path.resolve(__dirname, '../../qrCodeLogs'))) {
                     mkdirSync(path.resolve(__dirname, '../../qrCodeLogs'));
                 }
@@ -53,7 +53,8 @@ class SessionController {
                 await QRCode.toFile(path.resolve(__dirname, '../../qrCodeLogs', 'qr.png'), result.message);
 
                 return res.sendFile(path.resolve(__dirname, '../../qrCodeLogs', 'qr.png'));
-            }
+            } */
+            return res.status(200).send(result);
             return res.status(500).send("Não foi possível resgatar QR: " + result.message);
         } catch (error) {
             return res.status(500).send("Não foi possível resgatar QR: " + error);

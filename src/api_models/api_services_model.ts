@@ -1,3 +1,5 @@
+import { IMessage_format } from "./message_format";
+
 export class CurrentApi {
   private _api: API;
 
@@ -12,6 +14,14 @@ export class CurrentApi {
   ) {
     try {
       return this._api.send_message(phone_number, text_message, reply);
+    } catch (error) {
+      return false;
+    }
+  }
+
+  public async get_group_participants(group_id: string) {
+    try {
+      return this._api.get_group_participants(group_id);
     } catch (error) {
       return false;
     }
@@ -40,7 +50,7 @@ export interface API {
   _save_token?: boolean;
   _qr_log: string;
   _status: APIStatus;
-  _broadcast_url: string;
+  _broadcast_url: string | undefined;
 
   // Mandatory methods
   send_message(
@@ -48,8 +58,9 @@ export interface API {
     text_message: string,
     reply?: boolean
   ): Promise<CommForm>;
+  get_group_participants(group_id: string): Promise<CommForm>;
   parse_message(msg: any): Promise<IMessage_format>;
-  broadcast_message(msg: IMessage_format): Promise<CommForm>;  
+  broadcast_message(msg: IMessage_format): Promise<CommForm>;
 
   // Session Methods
   get_qrCode(): Promise<CommForm>;
@@ -66,40 +77,3 @@ export enum APIStatus {
   awaiting_qr = 1,
   active = 2,
 }
-
-// Message format interface for the API
-export interface IMessage_format {
-  //Message
-  id?: string;
-  body?: string;
-  text?: string;
-  /* type?: chat_type; */
-  from?: string;
-  to?: string;
-  isForwarded?: boolean;
-  chat_id?: string;
-  isFrom_group?: boolean;
-  isMedia?: boolean;
-  last_chat_message_id?: string;
-  not_Spam?: boolean;
-  timestamp?: number | string;
-  //Sender
-  sender_id?: string;
-  sender_name?: string;
-  sender_number?: string;
-  sender_pfp?: string;
-  //Extra params
-  command_key?: string;
-  command_key_raw?: string;
-  command_params?: Array<string>;
-  specific?: any;
-  //Venom Client
-  client_name?: any;
-}
-
-/* enum chat_type {
-    image = "image",
-    chat = "chat",
-    list_response = "list_response",
-    unknown = "unknown"
-} */

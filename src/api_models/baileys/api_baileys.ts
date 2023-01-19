@@ -18,13 +18,16 @@ export class baileys_api implements API {
     _bot_client: any;
     _save_token?: boolean;
     _qr_log: string;
+    _broadcast_url: string | undefined;
     _status: APIStatus;
 
-    constructor(api_name?: string, save_token?: boolean) {
+
+    constructor(api_name?: string, save_token?: boolean, broadcast_url?: string) {
         this._status = APIStatus.inactive;
         this._api_name = api_name ?? baileys_api.name;
         this._save_token = save_token ?? false;
         this._qr_log = "";
+        this._broadcast_url = broadcast_url;
 
         console.log(`⚡️[Neco]: Initializing ${this._api_name} API'`);
         this._clear_session();
@@ -38,6 +41,12 @@ export class baileys_api implements API {
         setTimeout(() => {
             this.close_connection("Auto timeout");
         }, 200000);
+    }
+    get_group_participants(group_id: string): Promise<CommForm> {
+        throw new Error("Method not implemented.");
+    }
+    broadcast_message(msg: IMessage_format): Promise<CommForm> {
+        throw new Error("Method not implemented.");
     }
 
     // Parses the phone number to Brazil only
