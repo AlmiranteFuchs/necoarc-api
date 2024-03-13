@@ -1,5 +1,4 @@
 import dotenv from 'dotenv';
-import { CurrentApi } from './api_models/api_services_model';
 dotenv.config();
 console.log(`                                     
 _____                 _____         
@@ -13,10 +12,12 @@ const http: any = require("http");
 const port: any = process.env.PORT || 3000;
 
 import { App } from "./app";
-import { baileys_api } from './api_models/baileys/api_baileys';
 import { ApiServicesController } from './api_controllers/api_services_controller';
+import { ApiSessions } from './api_models/api_model';
+import { wwebjs_api } from './api_models/wwebjs/api_wweb';
 
 new App().server.listen(port, () => { console.log(`⚡️[Neco]: Server is running at http://localhost:${port}`); });
 //#endregion APi Express Config
-//export const current_api: CurrentApi = new CurrentApi(new baileys_api());
-//ApiServicesController.Create_session("Sessão");
+
+// Test
+// const test_api:ApiSessions = new ApiSessions(new wwebjs_api("1"));

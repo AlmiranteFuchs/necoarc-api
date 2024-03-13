@@ -25,16 +25,15 @@
   "license": "ISC",
   "description": "Neco Arc or Never Ending Conversation Output Application by Received Commmand is a project that aims to control different conversation API's",
   "dependencies": {
-    "@adiwajshing/baileys": "^4.4.0",
-    "@adiwajshing/keyed-db": "^0.2.4",
     "@hapi/boom": "^10.0.0",
     "axios": "^0.27.2",
     "body-parser": "^1.20.0",
     "dotenv": "^16.0.1",
+    "ejs": "^3.1.9",
     "express": "^4.18.1",
     "express.js": "^1.0.0",
     "qrcode": "^1.5.1",
     "qrcode-terminal": "^0.12.0",
-    "whatsapp-web.js": "github:ReforwardDev/whatsapp-web.js#patch-1"
+    "whatsapp-web.js": "^1.23.0"
   }
 }

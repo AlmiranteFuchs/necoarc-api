@@ -1,6 +1,7 @@
 import bodyParser from 'body-parser';
 import express, { Express, Request, Response } from 'express';
 import { router } from "./router";
+import path from 'path';
 export class App {
   public server: express.Application;
 
@@ -9,6 +10,11 @@ export class App {
     this.server.use(bodyParser.urlencoded({ extended: false }))
     this.server.use(bodyParser.json())
     this.router();
+
+    this.server.set('view engine', 'ejs');
+    this.server.set('views', path.join(__dirname, 'views'));
+    this.server.use(express.static(path.join(__dirname, 'public')));
+
   }
 
   public router() {
