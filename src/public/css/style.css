@@ -1,0 +1,10 @@
+.fa.fa-outline {
+    color: transparent;
+    -webkit-text-stroke-width: 2px;
+    -webkit-text-stroke-color: red;
+}
+
+.fa.custom-fa {
+    -webkit-text-stroke-color: #0dcaf0;
+    color: transparent;
+}
