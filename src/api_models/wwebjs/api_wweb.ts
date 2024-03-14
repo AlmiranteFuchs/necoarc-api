@@ -24,9 +24,9 @@ export class wwebjs_api implements APISession {
 
         const client: Client = new Client({
             authStrategy: new LocalAuth({ clientId: this._session_id }),
-            puppeteer: {
-                // args: ['--proxy-server=proxy-server-that-requires-authentication.example.com'],
-                headless: false
+                puppeteer: {
+                    // args: ['--proxy-server=proxy-server-that-requires-authentication.example.com'],
+                headless: true
             }
         });
 
