@@ -20,4 +20,4 @@ new App().server.listen(port, () => { console.log(`⚡️[Neco]: Server is runni
 //#endregion APi Express Config
 
 // Test
-const test_api:ApiSessions = new ApiSessions(new wwebjs_api("1"));
+// const test_api:ApiSessions = new ApiSessions(new wwebjs_api("1"));
