@@ -1,3 +1,5 @@
+import { BotBehaviour } from "../model/bot_behaviou";
+
 export class ApiSessions {
     private _api: APISession;
 
@@ -22,6 +24,8 @@ export interface APISession {
     _client?: any;
     _qr_log: string | undefined;
     _status: APISessionStatus;
+
+    _behaviour: BotBehaviour | undefined;
 
 
     // send_message(
