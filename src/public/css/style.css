@@ -8,3 +8,8 @@
     -webkit-text-stroke-color: #0dcaf0;
     color: transparent;
 }
+
+.btn.btn-pill {
+    border-radius: 23px;
+}
+

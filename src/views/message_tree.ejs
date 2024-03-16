@@ -10,47 +10,79 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
 
-    <link rel="icon" href="./images/favicon-32x32.png" type="image/x-icon">
+    <link rel="icon" href="/images/favicon-32x32.png" type="image/x-icon">
 </head>
 
 <body>
-    <div class="grid">
-        <div class="card" id="card1">Card 1</div>
-        <div class="card" id="card2">Card 2</div>
-        <div class="card" id="card3">Card 3</div>
-    </div>
 
+
+    <!-- <button type="button" class="btn btn-outline-info button-pill">Info</button> -->
+    <a class="btn btn-sm btn-pill btn-outline-info controll-pill" href="#">Estado inicial</a>
+    <a class="btn btn-sm btn-pill btn-outline-info controll-pill" href="#">Estado inicial</a>
 </body>
 
 <style>
-    .grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 10px;
+    body {
+        margin: 0;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
     }
 
+    body {
+        background-color: #08415C;
+    }
+
+    .btn {
+        background-color: #0F78A9;
+        color: #EEE5E9;
+        font-weight: 900;
+    }
+
+
     .card {
-        background-color: #f0f0f0;
-        padding: 10px;
-        border: 1px solid #ccc;
+        width: 180px;
+        height: 300px;
+        border-radius: 5px;
+        border: 1px solid gainsboro;
+        overflow: hidden;
+        background: white;
+    }
+
+    .card .header {
+        background: transparent;
+        text-align: center;
+    }
+
+    .card .main {
+        width: 100%;
+        height: calc(100% - 20px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: sans-serif;
+        font-size: 20px;
     }
 </style>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/Draggable.min.js"></script>
+
 <script>
-    $(function () {
-        $(".card").draggable({
-            revert: "invalid",
-            zIndex: 1000,
-            cursor: "move"
+
+    const cards = document.querySelectorAll('.controll-pill')
+
+    cards.forEach((card) => {
+        const header = card.querySelector('.header')
+
+        Draggable.create(card, {
+            type: "x,y",
+            bounds: window,
+            trigger: header
+            // inertia: true,
         });
 
-        $(".grid").droppable({
-            accept: ".card",
-            drop: function (event, ui) {
-                $(this).append(ui.draggable);
-            }
-        });
-    });
+    })
+
+
 </script>
