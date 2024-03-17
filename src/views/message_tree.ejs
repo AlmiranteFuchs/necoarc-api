@@ -14,11 +14,12 @@
 </head>
 
 <body>
-
+    <div class="container-grid">
+        <a id="start" class="btn btn-sm btn-pill btn-outline-info controll-pill" href="#">Estado inicial</a>
+        <a id="end" class="btn btn-sm btn-pill btn-outline-info controll-pill" href="#">Estado inicial</a>
+    </div>
 
     <!-- <button type="button" class="btn btn-outline-info button-pill">Info</button> -->
-    <a class="btn btn-sm btn-pill btn-outline-info controll-pill" href="#">Estado inicial</a>
-    <a class="btn btn-sm btn-pill btn-outline-info controll-pill" href="#">Estado inicial</a>
 </body>
 
 <style>
@@ -33,10 +34,20 @@
         background-color: #08415C;
     }
 
+
     .btn {
         background-color: #0F78A9;
         color: #EEE5E9;
         font-weight: 900;
+    }
+
+    .container-grid {
+        width: 100%;
+        height: 100%;
+        /* Add your background pattern here */
+        background-image: radial-gradient(rgba(255, 255, 255, 0.171) 2px, transparent 0);
+        background-size: 30px 30px;
+        background-position: -5px -5px
     }
 
 
@@ -67,22 +78,53 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/Draggable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leader-line/1.0.3/leader-line.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script>
+    $(document).ready(function () {
+        const cards = document.querySelectorAll('.controll-pill');
 
-    const cards = document.querySelectorAll('.controll-pill')
+        cards.forEach((card) => {
+            Draggable.create(card, {
+                type: "x,y",
+                bounds: window,
+                // inertia: true,
+                onDragEnd: function () {
+                    updateLine();
+                },
+                onDrag: function () {
+                    updateLine();
+                }
+            });
 
-    cards.forEach((card) => {
-        const header = card.querySelector('.header')
-
-        Draggable.create(card, {
-            type: "x,y",
-            bounds: window,
-            trigger: header
-            // inertia: true,
         });
 
-    })
+        const line = new LeaderLine(
+            document.getElementById('start'),
+            document.getElementById('end'),{
+                startPlug: 'behind',
+                endPlug: 'behind',
+                color: '#0F78A9',
+                size: 2,
+                dash: { animation: true }
+            
+            }
+        );
 
+
+
+       
+        cards.forEach((card) => {
+            card.addEventListener('drag', updateLine);
+        });
+
+
+
+        function updateLine() {
+            line.position();
+        }
+
+    });
 
 </script>

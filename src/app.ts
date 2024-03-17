@@ -14,6 +14,7 @@ export class App {
     this.server.set('view engine', 'ejs');
     this.server.set('views', path.join(__dirname, 'views'));
     this.server.use(express.static(path.join(__dirname, 'public')));
+    this.server.use('/leader-line', express.static(__dirname + '/node_modules/leader-line'));
 
   }
 
