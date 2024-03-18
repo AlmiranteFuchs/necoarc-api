@@ -7,6 +7,11 @@
     <title>Arc Project</title>
     <link type="text/css" rel="stylesheet" href="/css/style.css">
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/Draggable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leader-line/1.0.3/leader-line.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
 
@@ -14,13 +19,75 @@
 </head>
 
 <body>
-    <div class="container-grid">
-        <a id="start" class="btn btn-sm btn-pill btn-outline-info controll-pill" href="#">Estado inicial</a>
-        <a id="end" class="btn btn-sm btn-pill btn-outline-info controll-pill" href="#">Estado inicial</a>
-    </div>
+    <main style="height: 100%; width: 100%;">
+        <div class="container-grid">
+            <nav class="floating-menu">
+                <h3>Floating Menu</h3>
+                <a href="/css/">CSS</a>
+                <a href="/html/">HTML</a>
+                <a href="/coldfusion/">ColdFusion</a>
+                <a href="/database/">Database</a>
+            </nav>
 
-    <!-- <button type="button" class="btn btn-outline-info button-pill">Info</button> -->
+            <a id="start" class="btn btn-sm btn-pill btn-outline-info controll-pill" href="#">Estado inicial</a>
+            <a id="end" class="btn btn-sm btn-pill btn-outline-info controll-pill" href="#">Estado inicial</a>
+        </div>
+        <!-- <button type="button" class="btn btn-outline-info button-pill">Info</button> -->
+    </main>
 </body>
+
+<script>
+    $(document).ready(function () {
+        const cards = document.querySelectorAll('.controll-pill');
+
+        cards.forEach((card) => {
+            Draggable.create(card, {
+                type: "x,y",
+                bounds: window,
+                // inertia: true,
+                onDragEnd: function () {
+                    updateLine();
+                },
+                onDrag: function (card) {
+                    updateLine();
+                }
+            });
+
+        });
+
+        const line = new LeaderLine(
+            document.getElementById('start'),
+            document.getElementById('end'), {
+            startPlug: 'behind',
+            endPlug: 'behind',
+            color: '#0F78A9',
+            size: 2,
+            dash: { animation: true },
+            // if overflow is true, the line will be extended to the edge of the container
+            // overflow: true,
+
+        }
+        );
+
+        function updateLine() {
+            line.position();
+
+            // Scroll to element on x
+            document.querySelector('.container-grid').scrollLeft = document.querySelector('.container-grid').scrollWidth;
+
+            // Scroll to element on y
+            document.querySelector('.container-grid').scrollTop = document.querySelector('.container-grid').scrollHeight;
+        }
+
+        // On user scroll 
+        document.querySelector('.container-grid').addEventListener('scroll', function () {
+            line.position();
+        });
+
+
+    });
+
+</script>
 
 <style>
     body {
@@ -28,12 +95,20 @@
         width: 100%;
         height: 100vh;
         overflow: hidden;
-    }
-
-    body {
         background-color: #08415C;
     }
 
+    .floating-menu {
+        background: #ffff;
+        border-radius: 20px 20px 20px 20px;
+        padding: 20px;
+        margin: 5px;
+        right: 0;
+        width: 30%;
+        height: 98%;
+        z-index: 100;
+        position: fixed;
+    }
 
     .btn {
         background-color: #0F78A9;
@@ -42,14 +117,15 @@
     }
 
     .container-grid {
-        width: 100%;
+        width: 70%;
         height: 100%;
+
+        overflow-x: scroll;
         /* Add your background pattern here */
         background-image: radial-gradient(rgba(255, 255, 255, 0.171) 2px, transparent 0);
         background-size: 30px 30px;
         background-position: -5px -5px
     }
-
 
     .card {
         width: 180px;
@@ -75,56 +151,3 @@
         font-size: 20px;
     }
 </style>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/Draggable.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leader-line/1.0.3/leader-line.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-
-<script>
-    $(document).ready(function () {
-        const cards = document.querySelectorAll('.controll-pill');
-
-        cards.forEach((card) => {
-            Draggable.create(card, {
-                type: "x,y",
-                bounds: window,
-                // inertia: true,
-                onDragEnd: function () {
-                    updateLine();
-                },
-                onDrag: function () {
-                    updateLine();
-                }
-            });
-
-        });
-
-        const line = new LeaderLine(
-            document.getElementById('start'),
-            document.getElementById('end'),{
-                startPlug: 'behind',
-                endPlug: 'behind',
-                color: '#0F78A9',
-                size: 2,
-                dash: { animation: true }
-            
-            }
-        );
-
-
-
-       
-        cards.forEach((card) => {
-            card.addEventListener('drag', updateLine);
-        });
-
-
-
-        function updateLine() {
-            line.position();
-        }
-
-    });
-
-</script>
