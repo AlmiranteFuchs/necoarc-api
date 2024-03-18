@@ -11,6 +11,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/Draggable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leader-line/1.0.3/leader-line.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://kit.fontawesome.com/dddbf2af22.js" crossorigin="anonymous"></script>
+
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
@@ -22,15 +24,17 @@
     <main style="height: 100%; width: 100%;">
         <div class="container-grid">
             <nav class="floating-menu">
-                <h3>Floating Menu</h3>
+                <h3>Interações</h3>
                 <a href="/css/">CSS</a>
                 <a href="/html/">HTML</a>
                 <a href="/coldfusion/">ColdFusion</a>
                 <a href="/database/">Database</a>
             </nav>
-
-            <a id="start" class="btn btn-sm btn-pill btn-outline-info controll-pill" href="#">Estado inicial</a>
-            <a id="end" class="btn btn-sm btn-pill btn-outline-info controll-pill" href="#">Estado inicial</a>
+            <a id="start" class="btn btn-sm btn-pill  controll-pill" href="#">Estado inicial</a>
+            <div class="controll-pill">
+                <a id="end" class="btn btn-sm btn-pill" href="#"><span class="mr-5">Estado inicial</span></a>
+                <i class="fa fa-plus-circle" aria-hidden="true"></i>
+            </div>
         </div>
         <!-- <button type="button" class="btn btn-outline-info button-pill">Info</button> -->
     </main>
@@ -72,11 +76,11 @@
         function updateLine() {
             line.position();
 
-            // Scroll to element on x
-            document.querySelector('.container-grid').scrollLeft = document.querySelector('.container-grid').scrollWidth;
+            // // Scroll to element on x
+            // document.querySelector('.container-grid').scrollLeft = document.querySelector('.container-grid').scrollWidth;
 
-            // Scroll to element on y
-            document.querySelector('.container-grid').scrollTop = document.querySelector('.container-grid').scrollHeight;
+            // // Scroll to element on y
+            // document.querySelector('.container-grid').scrollTop = document.querySelector('.container-grid').scrollHeight;
         }
 
         // On user scroll 
@@ -95,7 +99,7 @@
         width: 100%;
         height: 100vh;
         overflow: hidden;
-        background-color: #08415C;
+        background-color: #06354a;
     }
 
     .floating-menu {
@@ -111,7 +115,7 @@
     }
 
     .btn {
-        background-color: #0F78A9;
+        background-color: #486b7a;
         color: #EEE5E9;
         font-weight: 900;
     }
@@ -122,9 +126,9 @@
 
         overflow-x: scroll;
         /* Add your background pattern here */
-        background-image: radial-gradient(rgba(255, 255, 255, 0.171) 2px, transparent 0);
+        /* background-image: radial-gradient(rgba(255, 255, 255, 0.171) 2px, transparent 0);
         background-size: 30px 30px;
-        background-position: -5px -5px
+        background-position: -5px -5px */
     }
 
     .card {
