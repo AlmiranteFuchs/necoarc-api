@@ -43,20 +43,22 @@
                 <a href="/coldfusion/">ColdFusion</a>
                 <a href="/database/">Database</a>
             </nav>
-            <div id="initial-state" class="controll-pill">
+            <div id="initial-state" data-node="true" >
                 <div class="btn-group">
-                    <button id="end" class="btn btn-sm btn-pill" type="button" data-toggle="dropdown"
+                    <button id="end" class="btn btn-sm btn-pill first-btn-pill" type="button" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false" style="pointer-events: none;">
                         Estado inicial
                     </button>
-                    <button type="button" class="btn btn-sm dropdown-toggle dropdown-toggle-split"
+                    <button type="button" class="btn btn-sm dropdown-toggle dropdown-toggle-split first-btn-pill"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                         style="border-radius: 0px 25px 25px 0px;">
                         <i class="fa fa-plus-circle"></i>
 
                     </button>
                     <div class="dropdown-menu">
-                        ...
+                        <!-- On click -->
+                        <a class="dropdown-item" onmousedown="add_action(this)">Adicionar estado</a>
+
                     </div>
                 </div>
             </div>
@@ -67,22 +69,22 @@
 
 <script>
     $(document).ready(function () {
-        const cards = document.querySelectorAll('.controll-pill');
+        // const cards = document.querySelectorAll('.controll-pill');
 
-        cards.forEach((card) => {
-            Draggable.create(card, {
-                type: "x,y",
-                bounds: window,
-                // inertia: true,
-                onDragEnd: function () {
-                    updateLine();
-                },
-                onDrag: function (card) {
-                    updateLine();
-                }
-            });
+        // cards.forEach((card) => {
+        //     Draggable.create(card, {
+        //         type: "x,y",
+        //         bounds: window,
+        //         // inertia: true,
+        //         onDragEnd: function () {
+        //             updateLine();
+        //         },
+        //         onDrag: function (card) {
+        //             updateLine();
+        //         }
+        //     });
 
-        });
+        // });
 
         // const line = new LeaderLine(
         //     document.getElementById('start'),
@@ -98,20 +100,21 @@
         // }
         // );
 
-        function updateLine() {
-            line.position();
+        // function updateLine() {
+        //     line.position();
 
-            // // Scroll to element on x
-            // document.querySelector('.container-grid').scrollLeft = document.querySelector('.container-grid').scrollWidth;
+        //     // // Scroll to element on x
+        //     // document.querySelector('.container-grid').scrollLeft = document.querySelector('.container-grid').scrollWidth;
 
-            // // Scroll to element on y
-            // document.querySelector('.container-grid').scrollTop = document.querySelector('.container-grid').scrollHeight;
-        }
+        //     // // Scroll to element on y
+        //     // document.querySelector('.container-grid').scrollTop = document.querySelector('.container-grid').scrollHeight;
+        // }
+
 
         // On user scroll 
-        document.querySelector('.container-grid').addEventListener('scroll', function () {
-            line.position();
-        });
+        // document.querySelector('.container-grid').addEventListener('scroll', function () {
+        //     line.position();
+        // });
 
         // tranlsate initial-state to middle of the screen height
         const initial = document.getElementById('initial-state');
@@ -120,6 +123,105 @@
 
     });
 
+    const default_node = `
+            <div id="initial-state">
+                <div class="btn-group">
+                    <button id="end" class="btn btn-sm btn-pill first-btn-pill" type="button" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false" style="pointer-events: none;">
+                        Estado inicial
+                    </button>
+                    <button type="button" class="btn btn-sm dropdown-toggle dropdown-toggle-split first-btn-pill"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                        style="border-radius: 0px 25px 25px 0px;">
+                        <i class="fa fa-plus-circle"></i>
+
+                    </button>
+                    <div class="dropdown-menu">
+                        <!-- On click -->
+                        <a class="dropdown-item" href="#" onmousedown="add_action()">Adicionar estado</a>
+
+                    </div>
+                </div>
+            </div>
+    `;
+
+    function add_action(father_node) {
+        // Traverse father_node till find the data-node
+        let node = father_node;
+        while (node.getAttribute('data-node') !== 'true' || node === null) {
+            node = node.parentNode;
+        }
+
+        // Get id of the node
+        const id = node.getAttribute('id');
+
+        // Create new node 
+        var new_node = default_node;
+        // Change id of the new node
+        new_node = new_node.replace('initial-state', `new-node-${id + 1}`);
+
+        // Find container
+        const container = document.querySelector('.container-grid');
+
+        // Append new node to container
+        container.innerHTML += new_node;
+
+        // translate new node to close to the father node
+        const new_node_element = document.getElementById(`new-node-${id + 1}`);
+
+        // Get father node position
+        const father_node_position = father_node.getBoundingClientRect();
+
+        // Get new node position
+        const new_node_position = new_node_element.getBoundingClientRect();
+
+        // Translate new node to close to the father node
+        new_node_element.style.transform = `translate(${father_node_position.x + 100}px, ${father_node_position.y + 100}px)`;
+
+        // Add line to new node
+        const line = new LeaderLine(
+            document.getElementById(id).children[0],
+            document.getElementById(`new-node-${id + 1}`).children[0], {
+            startPlug: 'behind',
+            endPlug: 'behind',
+            color: '#0F78A9',
+            size: 2,
+            dash: { animation: true },
+            // if overflow is true, the line will be extended to the edge of the container
+            // overflow: true,
+
+        }
+        );
+        // Add drag to new node
+        Draggable.create(new_node_element, {
+            type: "x,y",
+            bounds: window,
+            // inertia: true,
+            onDragEnd: function () {
+                updateLine(line);
+            },
+            onDrag: function (card) {
+                updateLine(line);
+            }
+        });
+
+
+        // Update line position
+        updateLine(line);
+
+        
+
+    }
+
+    function updateLine(line) {
+        line.position();
+
+        // // Scroll to element on x
+        // document.querySelector('.container-grid').scrollLeft = document.querySelector('.container-grid').scrollWidth;
+
+        // // Scroll to element on y
+        // document.querySelector('.container-grid').scrollTop = document.querySelector('.container-grid').scrollHeight;
+    }
 </script>
 
 <style>
@@ -141,6 +243,10 @@
         height: 98%;
         z-index: 100;
         position: fixed;
+    }
+
+    .first-btn-pill {
+        background-color: rgb(125, 189, 30) !important;
     }
 
     .fa-plus-circle {
