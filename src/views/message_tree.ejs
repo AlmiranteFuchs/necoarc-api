@@ -43,7 +43,7 @@
                 <a href="/coldfusion/">ColdFusion</a>
                 <a href="/database/">Database</a>
             </nav>
-            <div id="initial-state" data-node="true" >
+            <div id="node-0" data-node="true" data-children="">
                 <div class="btn-group">
                     <button id="end" class="btn btn-sm btn-pill first-btn-pill" type="button" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false" style="pointer-events: none;">
@@ -55,11 +55,14 @@
                         <i class="fa fa-plus-circle"></i>
 
                     </button>
-                    <div class="dropdown-menu">
-                        <!-- On click -->
-                        <a class="dropdown-item" onmousedown="add_action(this)">Adicionar estado</a>
+                    <form action="">
 
-                    </div>
+                        <div class="dropdown-menu">
+                            <!-- On click -->
+                            <a class="dropdown-item add_action">Adicionar estado</a>
+
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -69,62 +72,22 @@
 
 <script>
     $(document).ready(function () {
-        // const cards = document.querySelectorAll('.controll-pill');
-
-        // cards.forEach((card) => {
-        //     Draggable.create(card, {
-        //         type: "x,y",
-        //         bounds: window,
-        //         // inertia: true,
-        //         onDragEnd: function () {
-        //             updateLine();
-        //         },
-        //         onDrag: function (card) {
-        //             updateLine();
-        //         }
-        //     });
-
-        // });
-
-        // const line = new LeaderLine(
-        //     document.getElementById('start'),
-        //     document.getElementById('end'), {
-        //     startPlug: 'behind',
-        //     endPlug: 'behind',
-        //     color: '#0F78A9',
-        //     size: 2,
-        //     dash: { animation: true },
-        //     // if overflow is true, the line will be extended to the edge of the container
-        //     // overflow: true,
-
-        // }
-        // );
-
-        // function updateLine() {
-        //     line.position();
-
-        //     // // Scroll to element on x
-        //     // document.querySelector('.container-grid').scrollLeft = document.querySelector('.container-grid').scrollWidth;
-
-        //     // // Scroll to element on y
-        //     // document.querySelector('.container-grid').scrollTop = document.querySelector('.container-grid').scrollHeight;
-        // }
-
-
-        // On user scroll 
-        // document.querySelector('.container-grid').addEventListener('scroll', function () {
-        //     line.position();
-        // });
-
         // tranlsate initial-state to middle of the screen height
-        const initial = document.getElementById('initial-state');
+        const initial = document.getElementById('node-0');
         initial.style.transform = `translateY(${window.innerHeight / 2.5}px)`;
+
+        
+        // On click add_action
+        $(document).on('click', '.add_action', function (event) {
+            // Get element of the event
+            const element = event.target;
+            add_action(element);
+        });
 
 
     });
-
     const default_node = `
-            <div id="initial-state">
+            <div id="initial-state" data-node="true" data-children="">
                 <div class="btn-group">
                     <button id="end" class="btn btn-sm btn-pill first-btn-pill" type="button" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false" style="pointer-events: none;">
@@ -138,14 +101,18 @@
                     </button>
                     <div class="dropdown-menu">
                         <!-- On click -->
-                        <a class="dropdown-item" href="#" onmousedown="add_action()">Adicionar estado</a>
+                        <a class="dropdown-item add_action">Adicionar estado</a>
 
                     </div>
                 </div>
             </div>
     `;
 
+
     function add_action(father_node) {
+        // close dropdown one parent above
+        father_node.parentNode.classList.remove('show');
+
         // Traverse father_node till find the data-node
         let node = father_node;
         while (node.getAttribute('data-node') !== 'true' || node === null) {
@@ -154,11 +121,17 @@
 
         // Get id of the node
         const id = node.getAttribute('id');
+        const id_num = id.split('-')[2] ?? 0;
 
+        // get father data-children
+        const father_data_children = node.getAttribute('data-children');
+        const childs = father_data_children.split(';');
+
+        
         // Create new node 
         var new_node = default_node;
         // Change id of the new node
-        new_node = new_node.replace('initial-state', `new-node-${id + 1}`);
+        new_node = new_node.replace('initial-state', `new-node-${id_num + childs.length}`);
 
         // Find container
         const container = document.querySelector('.container-grid');
@@ -167,7 +140,7 @@
         container.innerHTML += new_node;
 
         // translate new node to close to the father node
-        const new_node_element = document.getElementById(`new-node-${id + 1}`);
+        const new_node_element = document.getElementById(`new-node-${id_num + childs.length}`);
 
         // Get father node position
         const father_node_position = father_node.getBoundingClientRect();
@@ -181,7 +154,7 @@
         // Add line to new node
         const line = new LeaderLine(
             document.getElementById(id).children[0],
-            document.getElementById(`new-node-${id + 1}`).children[0], {
+            document.getElementById(`new-node-${id_num + childs.length}`).children[0], {
             startPlug: 'behind',
             endPlug: 'behind',
             color: '#0F78A9',
@@ -209,7 +182,7 @@
         // Update line position
         updateLine(line);
 
-        
+
 
     }
 
@@ -222,6 +195,8 @@
         // // Scroll to element on y
         // document.querySelector('.container-grid').scrollTop = document.querySelector('.container-grid').scrollHeight;
     }
+
+
 </script>
 
 <style>
