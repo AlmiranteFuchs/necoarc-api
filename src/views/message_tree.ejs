@@ -84,7 +84,6 @@
             add_action(element);
         });
 
-
     });
     const default_node = `
             <div id="initial-state" data-node="true" data-children="" class="draggable">
@@ -125,13 +124,12 @@
 
         // get father data-children
         const father_data_children = node.getAttribute('data-children');
-        const childs = father_data_children.split(';');
-
 
         // Create new node 
         var new_node = default_node;
+
         // Change id of the new node
-        new_node = new_node.replace('initial-state', `new-node-${id_num + childs.length}`);
+        new_node = new_node.replace('initial-state', `new-node-${(parseInt(id_num) + 1)}`);
 
         // Find container
         const container = document.querySelector('.container-grid');
@@ -139,7 +137,7 @@
         // Append new node to container
         container.innerHTML += new_node;
 
-        const new_node_element = document.getElementById(`new-node-${id_num + childs.length}`);
+        const new_node_element = document.getElementById(`new-node-${(parseInt(id_num) + 1)}`);
         // translate new node to close to the father node
 
         // Get father node position
@@ -151,27 +149,39 @@
         // Translate new node to close to the father node
         new_node_element.style.transform = `translate(${father_node_position.x + 100}px, ${father_node_position.y + 100}px)`;
 
-        // Add line to new node
-        let line = new LeaderLine(
-            document.getElementById(id).querySelector(".btn-group"),
-            new_node_element.querySelector(".btn-group")
-        );
+        // Adds new node to father data-children
+        elem_lines.push([id, `new-node-${(parseInt(id_num) + 1)}`]);
 
-        elem_lines.push([new_node_element, line]);
+        // Clear all lines
+        remakeLines();
+
         updateDraggables(new_node_element);
     }
 
+    function remakeLines() {
+        for (let i = 0; i < lines.length; i++) {
+            lines[i].remove();
+        }
+
+        lines = [];
+
+        for (let i = 0; i < elem_lines.length; i++) {
+            // Get element by ids
+            const elem1 = document.getElementById(elem_lines[i][0]);
+            const elem2 = document.getElementById(elem_lines[i][1]);
+
+            // Create line
+            lines.push(new LeaderLine(
+                elem1.querySelector(".btn-group"),
+                elem2.querySelector(".btn-group")
+            ));
+        }
+    }
+
+
     function updateLine() {
-        elem_lines.forEach(([elem, line]) => {
-            // DELETE LINE
-            line.remove();
-            // CREATE LINE Between two elements
-        });
-
-        for (let i = 0; i < elem_lines.length; i += 2) {
-            let last = elem_lines[i - 1];
-            let current = elem_lines[i];
-
+        for (let i = 0; i < elem_lines.length; i++) {
+            lines[i].position();
         }
 
         // // Scroll to element on x
@@ -181,6 +191,7 @@
         // document.querySelector('.container-grid').scrollTop = document.querySelector('.container-grid').scrollHeight;
     }
 
+    let lines = [];
     let elem_lines = [];
     function updateDraggables(new_elem) {
         // Add drag to new node
