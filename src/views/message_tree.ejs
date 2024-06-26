@@ -121,6 +121,8 @@
         // Get id of the node
         const id = node.getAttribute('id');
         const id_num = id.split('-')[2] ?? 0;
+        const id_key_num = id.split('-')[3] ?? 0;
+        console.log(id_key_num);
 
         // get father data-children
         const father_data_children = node.getAttribute('data-children');
@@ -128,8 +130,10 @@
         // Create new node 
         var new_node = default_node;
 
+        var id_key = `new-node-${(parseInt(id_num) + 1).toString() + `-` + (parseInt(id_key_num) + )}`;
+
         // Change id of the new node
-        new_node = new_node.replace('initial-state', `new-node-${(parseInt(id_num) + 1)}`);
+        new_node = new_node.replace('initial-state', id_key);
 
         // Find container
         const container = document.querySelector('.container-grid');
@@ -137,7 +141,7 @@
         // Append new node to container
         container.innerHTML += new_node;
 
-        const new_node_element = document.getElementById(`new-node-${(parseInt(id_num) + 1)}`);
+        const new_node_element = document.getElementById(id_key);
         // translate new node to close to the father node
 
         // Get father node position
@@ -150,7 +154,7 @@
         new_node_element.style.transform = `translate(${father_node_position.x + 100}px, ${father_node_position.y + 100}px)`;
 
         // Adds new node to father data-children
-        elem_lines.push([id, `new-node-${(parseInt(id_num) + 1)}`]);
+        elem_lines.push([id, id_key]);
 
         // Clear all lines
         remakeLines();
