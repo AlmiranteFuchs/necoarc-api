@@ -1,20 +1,21 @@
-function create_node (father, value){
+function create_node(father, value, line = null) {
     return {
         value: value,
         father: father,
-        children: []
+        children: [],
+        line: line
     }
 }
 
-function add_child (father, value){
+function add_child(father, value) {
     let new_node = create_node(father, value);
     father.children.push(new_node);
     return new_node;
 }
 
-function find_node (node, value){
+function find_node(node, value) {
     if (node.value === value) return node;
-    for (let i = 0; i < node.children.length; i++){
+    for (let i = 0; i < node.children.length; i++) {
         let found = find_node(node.children[i], value);
         if (found) return found;
     }
@@ -93,7 +94,7 @@ function add_action(father_node) {
     var new_node = default_node;
 
     // Create new id
-    const id_key = id + '-child-' + father.children.length + 1;
+    const id_key = id + '-child-' + (parseInt(father.children.length) + 1);
 
     // Push id to tree
     add_child(father, id_key);
@@ -116,54 +117,68 @@ function add_action(father_node) {
     // Translate new node to close to the father node
     new_node_element.style.transform = `translate(${father_node_position.x + 100}px, ${father_node_position.y + 100}px)`;
 
+    // remakeLines(Tree);
+    // Create line for the new node
+    let line = new LeaderLine(
+        document.getElementById(id).querySelector(".btn-group"),
+        document.getElementById(id_key).querySelector(".btn-group"),
+    );
+
+    // Add line to the tree
+    find_node(Tree, id_key).line = line;
+
+    // Add drag to new node
+    updateDraggables();
+
 }
 
-function remakeLines() {
-    for (let i = 0; i < lines.length; i++) {
-        lines[i].remove();
+
+// function remakeLines(tree) {
+//     if (tree.children.length === 0) return;
+//     // else remove line 
+//     for (let i = 0; i < tree.children.length; i++) {
+//         const child = tree.children[i];
+//         if (child.line) {
+//             child.line.remove();
+//             child.line = null;
+//         }
+//         remakeLines(child);
+//     }
+
+// }
+
+function updateLineRecursive(nodes) {
+    if (nodes.line) {
+        nodes.line.position();
     }
 
-    lines = [];
 
-    for (let i = 0; i < elem_lines.length; i++) {
-        // Get element by ids
-        const elem1 = document.getElementById(elem_lines[i][0]);
-        const elem2 = document.getElementById(elem_lines[i][1]);
-
-        // Create line
-        lines.push(new LeaderLine(
-            elem1.querySelector(".btn-group"),
-            elem2.querySelector(".btn-group")
-        ));
+    if (nodes.children.length === 0) return;
+    // else remove line 
+    for (let i = 0; i < nodes.children.length; i++) {
+        const child = nodes.children[i];
+       
+        updateLineRecursive(child);
     }
 }
 
 
 function updateLine() {
-    for (let i = 0; i < elem_lines.length; i++) {
-        lines[i].position();
-    }
-
-    // // Scroll to element on x
-    // document.querySelector('.container-grid').scrollLeft = document.querySelector('.container-grid').scrollWidth;
-
-    // // Scroll to element on y
-    // document.querySelector('.container-grid').scrollTop = document.querySelector('.container-grid').scrollHeight;
+    // Run through the tree and update lines
+    updateLineRecursive(Tree);
 }
 
-let lines = [];
-let elem_lines = [];
-function updateDraggables(new_elem) {
+function updateDraggables() {
     // Add drag to new node
     Draggable.create(".draggable", {
         type: "x,y",
         bounds: window,
         // inertia: true,
         onDragEnd: function () {
-            updateLine();
+            updateLineRecursive();
         },
         onDrag: function (card) {
-            updateLine();
+            updateLineRecursive();
         }
     });
 }
