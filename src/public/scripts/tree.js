@@ -1,30 +1,29 @@
-function create_node(father, value, line = null) {
+function create_node(father_node, id_value) {
     return {
-        value: value,
-        father: father,
+        id_value: id_value,
+        father: father_node,
         children: [],
-        line: line
     }
 }
 
-function add_child(father, value) {
-    let new_node = create_node(father, value);
-    father.children.push(new_node);
+function add_child(this_node, id_value) {
+    let new_node = create_node(this_node, id_value);
+    this_node.children.push(new_node);
     return new_node;
 }
 
 function find_node(node, value) {
-    if (node.value === value) return node;
+    if (node.id_value === value) { return node; }
     for (let i = 0; i < node.children.length; i++) {
         let found = find_node(node.children[i], value);
-        if (found) return found;
+        if (found !== null) { return found; }
     }
     return null;
 }
 
 //////
 const default_node = `
-            <div id="initial-state" data-node="true" data-children="" class="draggable">
+            <div id="initial-id" data-node="true" class="draggable">
                 <div class="btn-group">
                     <button id="end" class="btn btn-sm btn-pill first-btn-pill" type="button" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false" style="pointer-events: none;">
@@ -51,122 +50,63 @@ let Tree = null;
 
 $(document).ready(function () {
     // tranlsate initial-state to middle of the screen height
-    const initial = document.getElementById('node-0');
+    const initial = document.getElementById('n-0');
     initial.style.transform = `translateY(${window.innerHeight / 2.5}px)`;
 
-    // Add initial to tree
-    Tree = create_node(null, "node-0");
-    console.log(Tree);
+    // Add on click
+    $(".add_action").on("click", on_add_action);
 
-    // On click add_action
-    $(document).on('click', '.add_action', function (event) {
-        // Get element of the event
-        const element = event.target;
-        add_action(element);
-    });
+    // Create the initial node
+    Tree = create_node(null, "n-0");
 
 });
 
+function on_add_action(element) {
+    // Get the id of the clicked element
+    // Go back till data-node 
+    let node = element.target;
+    while (!node.getAttribute("data-node")) {node = node.parentNode;}
 
-
-function add_action(father_node) {
-    // close dropdown one parent above
-    father_node.parentNode.classList.remove('show');
-
-    // Traverse father_node till find the data-node
-    let node = father_node;
-    while (node.getAttribute('data-node') !== 'true' || node === null) {
-        node = node.parentNode;
-    }
-
-    // Get id of the node
-    const id = node.getAttribute('id');
+    // Get the id of the node
+    let id = node.getAttribute("id");
 
     // Search id in the tree
-    const father = find_node(Tree, id);
+    let found = find_node(Tree, id);
 
-    if (!father) {
-        alert('Could not create new node, father not found');
+    if (found === null) {
+        console.log("Node not found in the tree");
         return;
     }
 
-    // Create new node 
-    var new_node = default_node;
+    //  // Create a new node
 
-    // Create new id
-    const id_key = id + '-child-' + (parseInt(father.children.length) + 1);
+    const new_id = `${id}/n-${found.children.length}`;
 
-    // Push id to tree
-    add_child(father, id_key);
+    // Add the new node to the tree
+    let new_node = add_child(found, new_id);
 
-    // Change id of the new node
-    new_node = new_node.replace('initial-state', id_key);
+    // Add the new node to the DOM
+    let new_element = $(default_node);
+    new_element.attr("id", new_id);
+    new_element.appendTo(node.parentNode);
 
-    // Find container
-    const container = document.querySelector('.container-grid');
+    // add on click
+    new_element.find(".add_action").on("click", on_add_action);
 
-    // Append new node to container
-    container.innerHTML += new_node;
-
-    const new_node_element = document.getElementById(id_key);
-    // translate new node to close to the father node
-
-    // Get father node position
-    const father_node_position = father_node.getBoundingClientRect();
-
-    // Translate new node to close to the father node
-    new_node_element.style.transform = `translate(${father_node_position.x + 100}px, ${father_node_position.y + 100}px)`;
-
-    // remakeLines(Tree);
-    // Create line for the new node
-    let line = new LeaderLine(
-        document.getElementById(id).querySelector(".btn-group"),
-        document.getElementById(id_key).querySelector(".btn-group"),
-    );
-
-    // Add line to the tree
-    find_node(Tree, id_key).line = line;
-
-    // Add drag to new node
+    // Update the draggables
     updateDraggables();
 
+    // Create temporary leader line
+    let leader = new LeaderLine(
+        document.getElementById(id).querySelector(".btn-group"),
+        document.getElementById(new_id).querySelector(".btn-group"),
+    );
+
+    // Update the lines
+    redoLeaderLines();
+    
 }
 
-
-// function remakeLines(tree) {
-//     if (tree.children.length === 0) return;
-//     // else remove line 
-//     for (let i = 0; i < tree.children.length; i++) {
-//         const child = tree.children[i];
-//         if (child.line) {
-//             child.line.remove();
-//             child.line = null;
-//         }
-//         remakeLines(child);
-//     }
-
-// }
-
-function updateLineRecursive(nodes) {
-    if (nodes.line) {
-        nodes.line.position();
-    }
-
-
-    if (nodes.children.length === 0) return;
-    // else remove line 
-    for (let i = 0; i < nodes.children.length; i++) {
-        const child = nodes.children[i];
-       
-        updateLineRecursive(child);
-    }
-}
-
-
-function updateLine() {
-    // Run through the tree and update lines
-    updateLineRecursive(Tree);
-}
 
 function updateDraggables() {
     // Add drag to new node
@@ -175,12 +115,39 @@ function updateDraggables() {
         bounds: window,
         // inertia: true,
         onDragEnd: function () {
-            updateLineRecursive();
+            redoLeaderLines();
         },
         onDrag: function (card) {
-            updateLineRecursive();
+            redoLeaderLines();
         }
     });
 }
+
+function redoLeaderLines() {
+    // If element has lines, remove and create again
+    let lines = document.querySelectorAll(".leader-line");
+    lines.forEach(line => {
+        line.remove();
+    });
+
+    // Create new lines
+    // for each node in the tree
+    let queue = [Tree];
+    while (queue.length > 0) {
+        let node = queue.shift();
+        for (let i = 0; i < node.children.length; i++) {
+            let child = node.children[i];
+            let leader = new LeaderLine(
+                document.getElementById(node.id_value).querySelector(".btn-group"),
+                document.getElementById(child.id_value).querySelector(".btn-group"),
+            );
+            queue.push(child);
+        }
+    }
+
+
+
+}
+
 
 
