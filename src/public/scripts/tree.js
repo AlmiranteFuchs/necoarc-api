@@ -23,7 +23,7 @@ function find_node(node, value) {
 
 //////
 const default_node = `
-            <div id="initial-id" data-node="true" class="draggable">
+            <div id="initial-id" data-node="true" class="draggable" style="position: absolute">
                 <div class="btn-group">
                     <button id="end" class="btn btn-sm btn-pill first-btn-pill" type="button" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="false" style="pointer-events: none;">
@@ -49,6 +49,8 @@ const default_node = `
 let Tree = null;
 
 $(document).ready(function () {
+    boxBackgroundGrab();
+
     // tranlsate initial-state to middle of the screen height
     const initial = document.getElementById('n-0');
     initial.style.transform = `translateY(${window.innerHeight / 2.5}px)`;
@@ -65,7 +67,7 @@ function on_add_action(element) {
     // Get the id of the clicked element
     // Go back till data-node 
     let node = element.target;
-    while (!node.getAttribute("data-node")) {node = node.parentNode;}
+    while (!node.getAttribute("data-node")) { node = node.parentNode; }
 
     // Get the id of the node
     let id = node.getAttribute("id");
@@ -104,7 +106,7 @@ function on_add_action(element) {
 
     // Update the lines
     redoLeaderLines();
-    
+
 }
 
 
@@ -144,9 +146,61 @@ function redoLeaderLines() {
             queue.push(child);
         }
     }
+}
+
+function boxBackgroundGrab() {
+    const boxContainer = document.getElementById('box-container');
+    const box = document.getElementById('box');
+    let isDragging = false;
+    let startX, startY, startLeft, startTop;
+
+    boxContainer.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startLeft = parseInt(box.style.left || 0);
+        startTop = parseInt(box.style.top || 0);
+        boxContainer.style.cursor = 'grabbing';
 
 
+    });
 
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+
+        // Calculate new position
+        let newLeft = startLeft + dx;
+        let newTop = startTop + dy;
+
+        // Boundary checks
+        const containerWidth = boxContainer.offsetWidth;
+        const containerHeight = boxContainer.offsetHeight;
+        const boxWidth = box.offsetWidth;
+        const boxHeight = box.offsetHeight;
+
+        // Boundary checks with 20px tolerance
+        const tolerance = 20;
+
+        if (newLeft > tolerance) newLeft = tolerance; // Left boundary
+        if (newTop > tolerance) newTop = tolerance; // Top boundary
+        if (newLeft < containerWidth - boxWidth - tolerance) newLeft = containerWidth - boxWidth - tolerance; // Right boundary
+        if (newTop < containerHeight - boxHeight - tolerance) newTop = containerHeight - boxHeight - tolerance; // Bottom boundary
+
+        // Apply the new position
+        box.style.left = `${newLeft}px`;
+        box.style.top = `${newTop}px`;
+
+        // Update lines
+        redoLeaderLines();
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+        boxContainer.style.cursor = 'grab';
+    });
 }
 
 

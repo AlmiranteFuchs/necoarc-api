@@ -37,32 +37,37 @@
     <main style="height: 100%; width: 100%;">
         <div class="container-grid">
             <nav class="floating-menu">
-                <h3>Interações</h3>
-                <a href="/css/">CSS</a>
-                <a href="/html/">HTML</a>
-                <a href="/coldfusion/">ColdFusion</a>
-                <a href="/database/">Database</a>
+                <h3>Info</h3>
+
             </nav>
-            <div id="n-0" data-node="true" data-children="">
-                <div class="btn-group">
-                    <button id="end" class="btn btn-sm btn-pill first-btn-pill" type="button" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false" style="pointer-events: none;">
-                        Estado inicial
-                    </button>
-                    <button type="button" class="btn btn-sm dropdown-toggle dropdown-toggle-split first-btn-pill"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                        style="border-radius: 0px 25px 25px 0px;">
-                        <i class="fa fa-plus-circle"></i>
+        </div>
+        <div class="box-container" id="box-container">
+            <div class="box" id="box">
+                <div class="box-content">
+                    <div id="n-0" data-node="true" data-children="">
+                        <div class="btn-group">
+                            <button id="end" class="btn btn-sm btn-pill first-btn-pill" type="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                style="pointer-events: none;">
+                                Estado inicial
+                            </button>
+                            <button type="button"
+                                class="btn btn-sm dropdown-toggle dropdown-toggle-split first-btn-pill"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                style="border-radius: 0px 25px 25px 0px;">
+                                <i class="fa fa-plus-circle"></i>
 
-                    </button>
-                    <form action="">
+                            </button>
+                            <form action="">
 
-                        <div class="dropdown-menu">
-                            <!-- On click -->
-                            <a class="dropdown-item add_action">Adicionar estado</a>
+                                <div class="dropdown-menu">
+                                    <!-- On click -->
+                                    <a class="dropdown-item add_action">Adicionar estado</a>
 
+                                </div>
+                            </form>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -72,7 +77,34 @@
 </body>
 
 <script>
-    
+
+    const boxContainer = document.getElementById('box-container');
+    const box = document.getElementById('box');
+    let isDragging = false;
+    let startX, startY, startLeft, startTop;
+
+    boxContainer.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startLeft = parseInt(box.style.left || 0);
+        startTop = parseInt(box.style.top || 0);
+        boxContainer.style.cursor = 'grabbing';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        box.style.left = `${startLeft + dx}px`;
+        box.style.top = `${startTop + dy}px`;
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+        boxContainer.style.cursor = 'grab';
+    });
+
 
 </script>
 
@@ -91,10 +123,12 @@
         padding: 20px;
         margin: 5px;
         right: 0;
-        width: 30%;
+        width: 25%;
         height: 98%;
         z-index: 100;
         position: fixed;
+        border: 2px solid #ccc;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     }
 
     .first-btn-pill {
@@ -116,15 +150,38 @@
         font-weight: 900;
     }
 
-    .container-grid {
-        width: 70%;
+    body,
+    html {
         height: 100%;
+        margin: 0;
+        overflow: hidden;
+    }
 
-        overflow-x: scroll;
-        /* Add your background pattern here */
-        /* background-image: radial-gradient(rgba(255, 255, 255, 0.171) 2px, transparent 0);
+    .box-container {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        cursor: grab;
+    }
+
+    .box {
+        width: 200%;
+        height: 200%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        border: 2px solid #ccc;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        transform-origin: top left;
+        background-image: radial-gradient(rgba(255, 255, 255, 0.171) 2px, transparent 0);
         background-size: 30px 30px;
-        background-position: -5px -5px */
+        background-position: -5px -5px
+    }
+
+    .box-content {
+        padding: 50px;
+        font-size: 24px;
     }
 
     .card {
