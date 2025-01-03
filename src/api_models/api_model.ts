@@ -1,4 +1,4 @@
-import { BotBehaviour } from "../model/bot_behaviou";
+import { BotBehaviour } from "../model/bot_behaviour";
 
 export class ApiSessions {
     private _api: APISession;

@@ -1,0 +1,64 @@
+{
+  "first_step": {
+    "trigger_answer": "Hello",
+    "response": "Hi there! How can I help you today?",
+    "as_reply": true,
+    "next_steps": [
+      {
+        "trigger_answer": "I have a question about my account",
+        "response": "Sure, can you tell me more about the issue?",
+        "as_reply": false,
+        "next_steps": []
+      },
+      {
+        "trigger_answer": "I want to reset my password",
+        "response": "No problem! I can guide you through resetting your password.",
+        "as_reply": true,
+        "next_steps": [
+          {
+            "trigger_answer": "",
+            "response": "Please go to the reset password page: [reset link]",
+            "as_reply": true,
+            "next_steps": []
+          }
+        ]
+      },
+      {
+        "trigger_answer": "aaa",
+        "response": "No problem! I can guide you through resetting your password.",
+        "as_reply": true,
+        "next_steps": []
+      }
+    ]
+  },
+  "current_step": {
+    "trigger_answer": "Hello",
+    "response": "Hi there! How can I help you today?",
+    "as_reply": true,
+    "next_steps": [
+      {
+        "trigger_answer": "I have a question about my account",
+        "response": "Sure, can you tell me more about the issue?",
+        "as_reply": false,
+        "next_steps": []
+      },
+      {
+        "trigger_answer": "I want to reset my password",
+        "response": "No problem! I can guide you through resetting your password.",
+        "as_reply": true,
+        "next_steps": [
+          {
+            "trigger_answer": "Yes, please help me reset it",
+            "response": "Please go to the reset password page: [reset link]",
+            "as_reply": true,
+            "next_steps": []
+          }
+        ]
+      }
+    ]
+  },
+  "unknown_response": "Sorry, I didn't understand that. Could you please rephrase?",
+  "error_response": "Something went wrong! Please try again later.",
+  "goodbye_message": "Goodbye! Have a great day!",
+  "reset_timeout": 300
+}

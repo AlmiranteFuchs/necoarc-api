@@ -1,8 +1,13 @@
-import { ApiServicesController } from "../../api_controllers/api_services_controller";
-import { BotBehaviour, BotStep } from "../../model/bot_behaviou";
-import { APISession, APISessionStatus } from "../api_model";
-import WAWebJS, { Client, LocalAuth } from "whatsapp-web.js";
+import {ApiServicesController} from "../../api_controllers/api_services_controller";
+import {BotBehaviour, BotStep} from "../../model/bot_behaviour";
+import {APISession, APISessionStatus} from "../api_model";
+import WAWebJS, {Client, LocalAuth} from "whatsapp-web.js";
+import {createBotBehaviourFromJson} from "../../api_controllers/bot_behaviour_parser";
 
+enum SessionMessageStatus {
+    IDLE,
+    AWAITING_RESPONSE
+}
 
 export class wwebjs_api implements APISession {
     _session_id: string;
@@ -10,41 +15,26 @@ export class wwebjs_api implements APISession {
     _qr_log: string | undefined;
     _status: APISessionStatus;
     _behaviour: BotBehaviour | undefined;
+    _messageStatus: SessionMessageStatus;
 
     // Constructor
     constructor(_session_id: string) {
         this._session_id = _session_id;
         this._qr_log = undefined;
         this._status = APISessionStatus.inactive;
+        this._messageStatus = SessionMessageStatus.IDLE;
 
         // Setup phase
         this._init_();
 
-        // FIXME: remove this after 
-        const next_step: BotStep = {
-            next_steps: [],
-            response: "yippie!",
-            as_reply: false,
-            trigger_answer: "!ping"
-        }
-
-        var first_step: BotStep = {
-            next_steps: [next_step],
-            response: "",
-            as_reply: false,
-            trigger_answer: ""
-        }
-
-        this._behaviour = new BotBehaviour(first_step, "Hum... não entendi...", "Oops... algo de errado aconteceu, sinto muito, tente novamente", "Bom, parece poggers, até", 0);
-        // FIXME: remove this after 
-
+        this._behaviour = createBotBehaviourFromJson('../../db/bots_behaviours/session1.json');
     }
 
     private async _init_() {
         console.log(`⚡️[Neco]: Initializing session #${this._session_id}#...`);
 
         const client: Client = new Client({
-            authStrategy: new LocalAuth({ clientId: this._session_id }),
+            authStrategy: new LocalAuth({clientId: this._session_id}),
             puppeteer: {
                 headless: true
             }
@@ -61,7 +51,7 @@ export class wwebjs_api implements APISession {
 
             // DEBUG
             var qrcode = require('qrcode-terminal');
-            qrcode.generate(qr, { small: true });
+            qrcode.generate(qr, {small: true});
             // DEBUG
 
         });
@@ -91,8 +81,6 @@ export class wwebjs_api implements APISession {
             ApiServicesController.Remove_session(this._session_id);
         });
 
-
-
         client.on('message', msg => {
 
         });
@@ -102,37 +90,49 @@ export class wwebjs_api implements APISession {
             this._message_behaviour(msg);
         });
 
-
     }
 
     private _message_behaviour(msg: WAWebJS.Message) {
         const message: string = msg.body;
-        const next_options: BotStep[] = this._behaviour?.current_step.next_steps as BotStep[];
-
-        const next_step: BotStep = next_options.filter((step: BotStep) => {
-            return step.trigger_answer == message;
-        })[0];
-
-        if (next_step) {
-            // Goes to next setp
-            this._behaviour!.current_step = next_step;
-
-            // Sends message
-            this._send_message(msg, this._behaviour!.current_step.response, msg.from, this._behaviour!.current_step.as_reply);
 
 
-            // If no more steps ahead 
-            if (next_step.next_steps.length == 0) {
-                this._send_message(msg, this._behaviour!.goodbye_message, msg.from);
+        switch (this._messageStatus) {
+            case SessionMessageStatus.IDLE:
+                if (message == this._behaviour?.first_step.trigger_answer) {
+                    this._send_message(msg, this._behaviour!.first_step.response, msg.from, true);
+                    this._messageStatus = SessionMessageStatus.AWAITING_RESPONSE;
+                } else {
+                    // TODO: If dedicated say what
+                }
+                break;
 
-                this._behaviour!.current_step = this._behaviour!.first_step;
-            }
+            case SessionMessageStatus.AWAITING_RESPONSE:
+                const next_options: BotStep[] = this._behaviour?.current_step.next_steps as BotStep[];
 
+                const next_step: BotStep = next_options.filter((step: BotStep) => {
+                    return step.trigger_answer == message || step.trigger_answer == "";
+                })[0];
 
-        } else {
-            // this._behaviour!.current_step = this._behaviour!.first_step;
-            // msg.reply(this._behaviour!.unknown_response);
-            console.log(this._behaviour!.unknown_response); // FIXME: change to send func on prod
+                if (next_step) {
+                    // Goes to next setp
+                    this._behaviour!.current_step = next_step;
+
+                    // Sends message
+                    this._send_message(msg, this._behaviour!.current_step.response, msg.from, this._behaviour!.current_step.as_reply);
+
+                    // If no more steps ahead
+                    if (next_step.next_steps.length == 0) {
+                        this._send_message(msg, this._behaviour!.goodbye_message, msg.from);
+                        this._behaviour!.current_step = this._behaviour!.first_step;
+                        this._messageStatus = SessionMessageStatus.IDLE;
+                    }
+
+                } else {
+                    // this._behaviour!.current_step = this._behaviour!.first_step;
+                    // msg.reply(this._behaviour!.unknown_response);
+                    console.log(this._behaviour!.unknown_response); // FIXME: change to send func on prod
+                }
+                break;
         }
     }
 

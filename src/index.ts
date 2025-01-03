@@ -15,9 +15,10 @@ import { App } from "./app";
 import { ApiServicesController } from './api_controllers/api_services_controller';
 import { ApiSessions } from './api_models/api_model';
 import { wwebjs_api } from './api_models/wwebjs/api_wweb';
+import {createBotBehaviourFromJson} from "./api_controllers/bot_behaviour_parser";
 
-new App().server.listen(port, () => { console.log(`⚡️[Neco]: Server is running at http://localhost:${port}`); });
+//new App().server.listen(port, () => { console.log(`⚡️[Neco]: Server is running at http://localhost:${port}`); });
 //#endregion APi Express Config
 
 // Test
-// const test_api:ApiSessions = new ApiSessions(new wwebjs_api("1"));
+const test_api:ApiSessions = new ApiSessions(new wwebjs_api("1"));
