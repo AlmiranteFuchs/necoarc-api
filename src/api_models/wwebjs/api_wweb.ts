@@ -40,8 +40,7 @@ export class wwebjs_api implements APISession {
             }
         });
 
-        client.initialize();
-
+        await client.initialize();
 
         client.on('qr', (qr) => {
             // NOTE: This event will not be fired if a session is specified.
@@ -95,9 +94,9 @@ export class wwebjs_api implements APISession {
     private _message_behaviour(msg: WAWebJS.Message) {
         const message: string = msg.body;
 
-
         switch (this._messageStatus) {
             case SessionMessageStatus.IDLE:
+
                 if (message == this._behaviour?.first_step.trigger_answer) {
                     this._send_message(msg, this._behaviour!.first_step.response, msg.from, true);
                     this._messageStatus = SessionMessageStatus.AWAITING_RESPONSE;
@@ -144,5 +143,11 @@ export class wwebjs_api implements APISession {
         }
 
         this._client.sendMessage(chat_id, message);
+    }
+
+    private _format_behaviour_options_message(message: string, nextSteps: BotStep[]): string {
+        return message += nextSteps.map((step, i) => {
+            return `\n * Option ${i}: ${step.trigger_answer}`;
+        });
     }
 }

@@ -1,6 +1,6 @@
 export class BotBehaviour {
     first_step: BotStep;
-    current_step: BotStep; // Current step
+    current_step: BotStep;
     unknown_response: string;
     error_response: string;
     goodbye_message: string;

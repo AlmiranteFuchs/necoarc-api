@@ -19,7 +19,6 @@ export function createBotBehaviourFromJson(filePath: string): BotBehaviour {
     }
 
     const firstStep = mapBotStep(jsonObject.first_step);
-    const currentStep = mapBotStep(jsonObject.current_step);
 
     return new BotBehaviour(
         firstStep,
